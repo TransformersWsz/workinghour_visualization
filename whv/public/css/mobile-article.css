@@ -1,0 +1,36 @@
+.panel-default > .panel-heading{
+    color: #333;
+    background-color: red;
+    border-color: red;
+}
+tr{
+    border-top: 1px dashed #ccc;
+}
+td{
+    margin: 5px 0;
+    padding: 5px 0;
+}
+td>a{
+    text-decoration: none;
+    color:black;
+}
+td>a:hover,td>a:active{
+    color: red;
+}
+.page{
+    margin: 5px;
+    padding: 5px;
+    text-align: center;
+}
+a.num,a.prev,a.next{
+    color: black;
+    font-size: 13px;
+    margin-left: 5px;
+}
+span.current{
+    margin-left: 5px;
+    color: red;
+}
+a.num:active,a.num:hover{
+    color: red;
+}

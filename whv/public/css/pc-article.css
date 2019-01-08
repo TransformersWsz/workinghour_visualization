@@ -1,0 +1,55 @@
+body{
+    margin: 0;
+    padding: 0;
+}
+.navbar{
+    margin-bottom: 0;
+}
+td>a{
+    text-decoration: none;
+    color:black;
+}
+td>a:hover,td>a:active{
+    color: red;
+}
+.page{
+    margin: 5px;
+    padding: 5px;
+    text-align: center;
+}
+a.num,a.prev,a.next{
+    color: black;
+    font-size: 13px;
+    margin-left: 5px;
+}
+span.current{
+    margin-left: 5px;
+    color: red;
+}
+a.num:active,a.num:hover{
+    color: red;
+}
+.main{
+    margin-top: 30px;
+}
+.left{
+    text-align: center;
+    width:25%;
+    float:left;
+}
+.right{
+    width:75%;
+    float: left;
+    border: 5px solid red;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius:10px;
+}
+tr{
+    border-top: 1px dashed #ccc;
+    border-bottom: 1px dashed #ccc;
+}
+td{
+    margin: 5px 0;
+    padding: 5px 0;
+}

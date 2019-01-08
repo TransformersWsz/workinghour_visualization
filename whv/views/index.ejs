@@ -1,11 +1,652 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/css/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcomse to <%= title %></p>
-  </body>
+
+<head>
+    <title>
+        <%= title %>
+    </title>
+    <link type="text/css" rel='stylesheet' href='/css/bootstrap.min.css' />
+    <link rel="icon" href="/img/favicon.ico">
+
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <link type="text/css" rel='stylesheet' href='/css/bootstrap-table.min.css' />
+    <script type="text/javascript" src="/js/bootstrap-table.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap-table-en-US.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap-table-toolbar.js"></script>
+    <script type="text/javascript" src="/js/echarts.min.js"></script>
+
+    <style>
+        .chart {
+            margin-left: 20px;
+            margin-right: 20px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+        #left {
+            flex: 1;
+            height: 400px;
+            width: 800px;
+        }
+        #middle {
+            width: 10%;
+            height: 400px;
+        }
+        #right {
+            flex: 1;
+            height: 400px;
+        }
+
+        .out {
+            margin-left: 20px;
+            margin-right: 20px;
+            margin-bottom: 50px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse  navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Bootstrap theme</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">Home</a></li>
+
+                    <li><a href="#contact">Contact</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                            aria-expanded="false">Dropdown <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Action</a></li>
+                            <li><a href="#">Another action</a></li>
+
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <p style="height: 50px"></p>
+
+    <div class="chart">
+        <div id="left"></div>
+        <div id="middle"></div>
+        <div id="right"></div>
+    </div>
+
+
+    <div id="toolbar" class="btn-group">
+        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal3">
+            <i class="glyphicon glyphicon-plus"></i>
+        </button>
+    </div>
+    <!--新增项目信息-->
+    <div class="modal fade" id="modal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Add New Working Information</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Project</label>
+                        <input type="text" class="form-control" id="pj_name">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select class="form-control" id="role_id">
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Month</label>
+                        <select class="form-control" id="month_name">
+                            <option value=""></option>
+                            <option value="January">January</option>
+                            <option value="February">February</option>
+                            <option value="March">March</option>
+                            <option value="April">April</option>
+                            <option value="May">May</option>
+                            <option value="June">June</option>
+                            <option value="July">July</option>
+                            <option value="August">August</option>
+                            <option value="September">September</option>
+                            <option value="October">October</option>
+                            <option value="November">November</option>
+                            <option value="December">December</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Working Hour</label>
+                        <input type="text" class="form-control" id="hour_time">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="submit" onclick="addNewWorkingInformation()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="success" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Success</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Add new working information success.</p>
+                </div>
+                <div class="modal-footer">
+                    <!-- <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button> -->
+
+                    <button type="button" class="btn btn-primary" onclick="reloadPage()">OK</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div class="modal fade" id="failure" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Failure</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Add new working information failure.Please try it again.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div class="out">
+        <table id="table"></table>
+    </div>
+
+
+
+</body>
+<script>
+    var $table = $('#table');
+
+
+    function resetModal() {
+        $("#pj_name").val("");
+        $("#role_id").val("");
+        $("#month_name").val("");
+        $("#hour_time").val("");
+    }
+
+    var leftChart;
+    var rightChart;
+    var xAxisData = Array(12).fill("");
+    var projects = [];
+    var series = [];
+
+    // 显示左边柱状图
+    function formatLeftChartsData(data) {
+        const length = data.length;
+        const proset = new Set();
+        for (let i = 0; i < length; i++) {
+            proset.add(data[i].pj_name);
+
+            switch (data[i].month_name) {
+                case "January":
+                    xAxisData[0] = "January";
+                    break;
+                case "February":
+                    xAxisData[1] = "February";
+                    break;
+                case "March":
+                    xAxisData[2] = "March";
+                    break;
+                case "April":
+                    xAxisData[3] = "April";
+                    break;
+                case "May":
+                    xAxisData[4] = "May";
+                    break;
+                case "June":
+                    xAxisData[5] = "June";
+                    break;
+                case "July":
+                    xAxisData[6] = "July";
+                    break;
+                case "August":
+                    xAxisData[7] = "August";
+                    break;
+                case "September":
+                    xAxisData[8] = "September";
+                    break;
+                case "October":
+                    xAxisData[9] = "October";
+                    break;
+                case "November":
+                    xAxisData[10] = "November";
+                    break;
+                case "December":
+                    xAxisData[11] = "December";
+                    break;
+
+            }
+        }
+
+        xAxisData = xAxisData.filter((value) => {
+            return value != ""
+        });
+
+        projects = Array.from(proset);
+
+
+        const xAxisDataLength = xAxisData.length;
+        // series 个数
+        const projectsLength = projects.length;
+
+        var dataArray = initDataArray(projectsLength);
+        for (let i = 0; i < xAxisDataLength; i++) {
+            for (let j = 0; j < projectsLength; j++) {
+                // 查找某个项目某个月份对应的工时
+                pushDataArray(dataArray[j], projects[j], xAxisData[i], data);
+            }
+        }
+
+        initSeries(series, projects, dataArray);
+
+        var option = {
+            legend: {
+                data: projects,
+                align: 'left'
+            },
+
+            tooltip: {},
+            xAxis: {
+                data: xAxisData,
+                name: 'Month',
+                silent: false,
+                axisLine: {
+                    onZero: true
+                },
+                splitLine: {
+                    show: false
+                },
+                splitArea: {
+                    show: false
+                }
+            },
+            yAxis: {
+                name: "hour",
+                splitArea: {
+                    show: false
+                }
+            },
+            grid: {
+                left: 100
+            },
+
+            series: series
+        };
+
+        leftChart.setOption(option);
+    }
+
+    function initDataArray(projectsLength) {
+        var dataArray = new Array();
+        for (let i = 0; i < projectsLength; i++) {
+            dataArray[i] = new Array();
+        }
+        return dataArray;
+    }
+
+    function pushDataArray(someData, someProject, month_name, data) {
+        const dataLength = data.length;
+        var isExist = 0;
+        for (let i = 0; i < dataLength; i++) {
+            if (data[i].pj_name == someProject && data[i].month_name == month_name) {
+                isExist = 1;
+                someData.push(data[i].hour_time);
+                break;
+            }
+        }
+        if (isExist == 0) {
+            someData.push(0);
+        }
+    }
+
+    function initSeries(series, projects, dataArray) {
+        const projectsLength = projects.length;
+        for (let i = 0; i < projectsLength; i++) {
+            const temp = {};
+            temp.name = projects[i];
+            temp.type = "bar";
+            temp.stack = "one";
+            temp.itemStyle = {
+                emphasis: {
+                    barBorderWidth: 1,
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowOffsetY: 0,
+                    shadowColor: 'rgba(0,0,0,0.5)'
+                }
+            };
+            temp.data = dataArray[i];
+
+            series.push(temp);
+        }
+    }
+
+    // 显示右边柱状图
+    function formatRightChartsData(data) {
+        const rightDataOfChart = getFormattedDataOfRightChart(data);
+        var option = {
+            title: {
+                text: "Working hour pie",
+                x: "center"
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                x : 'center',
+                y : 'bottom',
+                data: projects
+            },
+            toolbox: {
+                show : true,
+                feature : {
+                    saveAsImage : {show: true}
+                }
+            },
+            calculable : true,
+            series : [
+                {
+                    name:'area mode',
+                    type:'pie',
+                    radius : [30, 110],
+                    center : ['50%', '50%'],
+                    roseType : 'area',
+                    data: rightDataOfChart
+                }
+            ]
+        };
+        rightChart.setOption(option);
+    }
+
+    function getFormattedDataOfRightChart(data) {
+        const formattedDataOfRightChart = [];
+
+        const dataLength = data.length;
+        for (let i = 0; i < dataLength; i++) {
+            updateFormattedDataOfRightChart(formattedDataOfRightChart, data[i]);
+        }
+        return formattedDataOfRightChart;
+    }
+
+    function updateFormattedDataOfRightChart(formattedDataOfRightChart, oneData) {
+        var isExist = 0;
+        const formattedDataOfRightChartLength = formattedDataOfRightChart.length;
+        for (let i = 0; i < formattedDataOfRightChartLength; i++) {
+            if (formattedDataOfRightChart[i].name == oneData.pj_name) {
+                isExist = 1;
+                formattedDataOfRightChart[i].value += oneData.hour_time;
+            }
+        }
+        if (isExist == 0) {
+            formattedDataOfRightChart.push({
+                value: oneData.hour_time,
+                name: oneData.pj_name
+            });
+        }
+    }
+
+    function initCharts() {
+        leftChart = echarts.init(document.getElementById("left"));
+        rightChart = echarts.init(document.getElementById("right"));
+        $.get("/chartsdata", (data) => {
+            formatLeftChartsData(data);
+            formatRightChartsData(data);
+        });
+    }
+
+    $(function () {
+        $("#modal3").on("hide.bs.modal", function () {
+            resetModal();
+        });
+
+        initCharts();
+
+        window.onresize = function () {
+            rightChart.resize();
+            leftChart.resize();
+        };
+
+        var otable = new tableinit();
+        otable.init();
+
+        getRoles();
+    });
+
+    var tableinit = function () {
+        var otableinit = new Object();
+        otableinit.init = function () {
+            $table.bootstrapTable({
+                toolbar: "#toolbar",
+                showRefresh: true,
+                showColumns: true,
+                search: true,
+                searchOnEnterKey: true,
+                url: "/gs",
+                method: 'get',
+                cache: false,
+                striped: true,
+                columns: [
+                    [{
+                            title: "Item",
+                            field: "pj_name"
+                        },
+
+                        {
+                            title: "Standard Working Hours",
+                            field: "january_role_name"
+                        }, {
+                            title: 'Jan',
+                            field: 'january_hour_time'
+                        },
+
+
+                        {
+                            title: "Standard Working Hours",
+                            field: 'february_role_name'
+                        }, {
+                            title: 'Feb',
+                            field: 'february_hour_time'
+                        },
+
+
+                        {
+                            title: "Standard Working Hours",
+                            field: 'march_role_name'
+                        }, {
+                            title: 'Mar',
+                            field: 'march_hour_time'
+                        },
+
+
+                        {
+                            title: "Standard Working Hours",
+                            field: 'april_role_name'
+                        }, {
+                            title: 'Apr',
+                            field: 'april_hour_time'
+                        },
+
+
+                        {
+                            title: "Standard Working Hours",
+                            field: 'may_role_name'
+                        }, {
+                            title: 'May',
+                            field: 'may_hour_time'
+                        },
+
+
+                        {
+                            title: "Standard Working Hours",
+                            field: 'june_role_name'
+                        }, {
+                            title: 'Jun',
+                            field: 'june_hour_time'
+                        },
+
+
+                        {
+                            title: "Standard Working Hours",
+                            field: 'july_role_name'
+                        }, {
+                            title: 'Jul',
+                            field: 'july_hour_time'
+                        },
+
+
+                        {
+                            title: "Standard Working Hours",
+                            field: 'august_role_name'
+                        }, {
+                            title: 'Aug',
+                            field: 'august_hour_time'
+                        },
+
+
+                        {
+                            title: "Standard Working Hours",
+                            field: 'september_role_name'
+                        }, {
+                            title: 'Sep',
+                            field: 'september_hour_time'
+                        },
+
+
+                        {
+                            title: "Standard Working Hours",
+                            field: 'october_role_name'
+                        }, {
+                            title: 'Oct',
+                            field: 'october_hour_time'
+                        },
+
+
+                        {
+                            title: "Standard Working Hours",
+                            field: 'november_role_name'
+                        }, {
+                            title: 'Nov',
+                            field: 'november_hour_time'
+                        },
+
+
+                        {
+                            title: "Standard Working Hours",
+                            field: 'december_role_name'
+                        }, {
+                            title: 'Dec',
+                            field: 'december_hour_time'
+                        }
+                    ]
+
+                ],
+
+            });
+        };
+        return otableinit;
+    };
+
+    function getRoles() {
+        $.get("/role", (roles) => {
+            $("#role_id").empty();
+            $("#role_id").append("<option value='0'></option>");
+            $.each(roles, (index, value) => {
+                const option = "<option value=" + value.role_id + ">" + value.role_name + "</option>";
+                $("#role_id").append(option);
+            });
+        })
+    }
+
+    function validate() {
+        if ($("#pj_name").val() == "") {
+            alert("Please input project name!");
+            return false;
+        }
+        if ($("#role_id").val() == "0") {
+            alert("Please select one role!");
+            return false;
+        }
+        if ($("#month_name").val() == "") {
+            alert("Please select one month!");
+            return false;
+        }
+        if ($("#hour_time").val() == "") {
+            alert("Please input hour!");
+            return false;
+        }
+        if (isNaN($("#hour_time").val()) == true) {
+            alert("Please input illegal hour!");
+            return false;
+        }
+        return true;
+    }
+
+    function reloadPage() {
+        window.location.href = "/";
+    }
+
+    function addNewWorkingInformation() {
+
+        const validateRes = validate();
+        if (validateRes == true) {
+
+            $.post("/workinfo", {
+                pj_name: $("#pj_name").val(),
+                role_id: parseInt($("#role_id").val()),
+                month_name: $("#month_name").val(),
+                hour_time: parseFloat($("#hour_time").val())
+            }, (json) => {
+                $('#modal3').modal('hide');
+                if (json.result == 1) {
+                    $("#success").modal("show");
+                } else {
+                    $("#failure").modal("show");
+                }
+                $("#table").bootstrapTable("refresh");
+                //initCharts();
+            });
+        }
+    }
+</script>
+
 </html>

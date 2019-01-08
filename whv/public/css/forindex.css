@@ -1,0 +1,46 @@
+body{
+    margin: 0;
+    padding: 0;
+    background: #EEEEEE;
+}
+.top_div {
+    background: no-repeat center;
+    background-size: cover;
+    height: 60px;
+    min-width: 1300px;
+    max-width: 1700px;
+}
+td {
+    border: 1px solid #7E7575;
+    padding: 10px;
+}
+table {
+    cell-spacing: 0px;
+}
+h4{
+    margin-top: 0; !important;
+    margin-bottom: 10px; !important;
+}
+.navbar{
+    margin-bottom: 0; !important;
+}
+.hor_center{
+    width:200px;
+    margin:10px auto;
+}
+div.myform{
+    opacity: 0.8;
+    background: #e6e0e0;
+    min-width: 1150px;
+    height: 60%;
+}
+.bottom_div {
+    background: no-repeat center #E9E9E9;
+    background-size: cover;
+    height: 60px;
+    position: absolute;
+    width: 100%;
+    top: 580px;
+    min-width: 1300px;
+    max-width: 1700px;
+}
