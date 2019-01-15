@@ -1,5 +1,8 @@
 module.exports = (sequelize, Sequelize) => {
     const Hybrid = sequelize.define("hybrid", {
+        hy_id: {
+            type: Sequelize.INTEGER
+        },
         user_id: {
             type: Sequelize.INTEGER
         },

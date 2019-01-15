@@ -8,6 +8,9 @@ module.exports = (sequelize, Sequelize) => {
         },
         user_name: {
             type: Sequelize.STRING
+        },
+        user_password: {
+            type: Sequelize.STRING
         }
     }, {
         timestamps: false,

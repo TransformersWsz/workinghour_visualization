@@ -3,10 +3,10 @@
 
 <head>
     <title>
-        <%= title %>
+        index
     </title>
     <link type="text/css" rel='stylesheet' href='/css/bootstrap.min.css' />
-    <link rel="icon" href="/img/favicon.ico">
+    <link rel="icon" type="image/png" href="/img/icons/favicon.ico" />
 
     <script type="text/javascript" src="/js/jquery.js"></script>
     <script type="text/javascript" src="/js/bootstrap.min.js"></script>
@@ -18,8 +18,8 @@
 
     <style>
         .chart {
-            margin-left: 20px;
-            margin-right: 20px;
+            margin-left: 10px;
+            margin-right: 10px;
             display: flex;
             flex-direction: row;
             justify-content: space-between;
@@ -43,6 +43,12 @@
             margin-right: 20px;
             margin-bottom: 50px;
         }
+
+        #rows {
+            color: red;
+            font-size: 20px;
+            font-weight: 900;
+        }
     </style>
 
 </head>
@@ -59,10 +65,10 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Bootstrap theme</a>
+                <a class="navbar-brand" href="/">Bosch Home</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
+                <!-- <ul class="nav navbar-nav">
                     <li class="active"><a href="#">Home</a></li>
 
                     <li><a href="#contact">Contact</a></li>
@@ -75,6 +81,10 @@
 
                         </ul>
                     </li>
+                </ul> -->
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/logout">Log out</a></li>
                 </ul>
             </div>
         </div>
@@ -93,7 +103,32 @@
         <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal3">
             <i class="glyphicon glyphicon-plus"></i>
         </button>
+        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#deletemodal" onclick="getRows()">
+            <i class="glyphicon glyphicon-minus"></i>
+        </button>
     </div>
+
+    <!-- 删除项目信息 -->
+    <div class="modal fade" id="deletemodal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Delete Working Information</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure to delete these working information : <span id="rows"></span>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" id="del" onclick="deleteWorkingInformation()">delete</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+
     <!--新增项目信息-->
     <div class="modal fade" id="modal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
@@ -149,6 +184,7 @@
         </div>
     </div>
 
+
     <div class="modal fade" id="success" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -195,6 +231,19 @@
 <script>
     var $table = $('#table');
 
+    function getRows() {
+        const rows = $table.bootstrapTable("getSelections");
+        var info = "";
+        for (let i = 0; i < rows.length; i++) {
+            if (i != rows.length - 1) {
+                info += rows[i].pj_name + " , ";
+            }
+            else {
+                info += rows[i].pj_name;
+            }
+        }
+        $("#rows").html(info);
+    }
 
     function resetModal() {
         $("#pj_name").val("");
@@ -279,9 +328,24 @@
         initSeries(series, projects, dataArray);
 
         var option = {
+            title: {
+                text: "Bar",
+                x: "left"
+            },
             legend: {
                 data: projects,
                 align: 'left'
+            },
+            toolbox: {
+                show: true,
+
+                feature: {
+
+                    saveAsImage: {
+                        show: true,
+                        title: "save as iamge"
+                    }
+                }
             },
 
             tooltip: {},
@@ -365,35 +429,37 @@
         const rightDataOfChart = getFormattedDataOfRightChart(data);
         var option = {
             title: {
-                text: "Working hour pie",
-                x: "center"
+                text: "Pie",
+                x: "left"
             },
-            tooltip : {
+            tooltip: {
                 trigger: 'item',
                 formatter: "{a} <br/>{b} : {c} ({d}%)"
             },
             legend: {
-                x : 'center',
-                y : 'bottom',
+                x: 'center',
                 data: projects
             },
             toolbox: {
-                show : true,
-                feature : {
-                    saveAsImage : {show: true}
+                show: true,
+
+                feature: {
+
+                    saveAsImage: {
+                        show: true,
+                        title: "save as image"
+                    }
                 }
             },
-            calculable : true,
-            series : [
-                {
-                    name:'area mode',
-                    type:'pie',
-                    radius : [30, 110],
-                    center : ['50%', '50%'],
-                    roseType : 'area',
-                    data: rightDataOfChart
-                }
-            ]
+            calculable: true,
+            series: [{
+                name: 'area mode',
+                type: 'pie',
+                radius: [30, 110],
+                center: ['50%', '50%'],
+                roseType: 'area',
+                data: rightDataOfChart
+            }]
         };
         rightChart.setOption(option);
     }
@@ -467,12 +533,15 @@
                 striped: true,
                 columns: [
                     [{
-                            title: "Item",
+                            checkbox: true
+                        },
+                        {
+                            title: "Project",
                             field: "pj_name"
                         },
 
                         {
-                            title: "Standard Working Hours",
+                            title: "Role",
                             field: "january_role_name"
                         }, {
                             title: 'Jan',
@@ -481,7 +550,7 @@
 
 
                         {
-                            title: "Standard Working Hours",
+                            title: "Role",
                             field: 'february_role_name'
                         }, {
                             title: 'Feb',
@@ -490,7 +559,7 @@
 
 
                         {
-                            title: "Standard Working Hours",
+                            title: "Role",
                             field: 'march_role_name'
                         }, {
                             title: 'Mar',
@@ -499,7 +568,7 @@
 
 
                         {
-                            title: "Standard Working Hours",
+                            title: "Role",
                             field: 'april_role_name'
                         }, {
                             title: 'Apr',
@@ -508,7 +577,7 @@
 
 
                         {
-                            title: "Standard Working Hours",
+                            title: "Role",
                             field: 'may_role_name'
                         }, {
                             title: 'May',
@@ -517,7 +586,7 @@
 
 
                         {
-                            title: "Standard Working Hours",
+                            title: "Role",
                             field: 'june_role_name'
                         }, {
                             title: 'Jun',
@@ -526,7 +595,7 @@
 
 
                         {
-                            title: "Standard Working Hours",
+                            title: "Role",
                             field: 'july_role_name'
                         }, {
                             title: 'Jul',
@@ -535,7 +604,7 @@
 
 
                         {
-                            title: "Standard Working Hours",
+                            title: "Role",
                             field: 'august_role_name'
                         }, {
                             title: 'Aug',
@@ -544,7 +613,7 @@
 
 
                         {
-                            title: "Standard Working Hours",
+                            title: "Role",
                             field: 'september_role_name'
                         }, {
                             title: 'Sep',
@@ -553,7 +622,7 @@
 
 
                         {
-                            title: "Standard Working Hours",
+                            title: "Role",
                             field: 'october_role_name'
                         }, {
                             title: 'Oct',
@@ -562,7 +631,7 @@
 
 
                         {
-                            title: "Standard Working Hours",
+                            title: "Role",
                             field: 'november_role_name'
                         }, {
                             title: 'Nov',
@@ -571,7 +640,7 @@
 
 
                         {
-                            title: "Standard Working Hours",
+                            title: "Role",
                             field: 'december_role_name'
                         }, {
                             title: 'Dec',
@@ -638,14 +707,47 @@
             }, (json) => {
                 $('#modal3').modal('hide');
                 if (json.result == 1) {
-                    $("#success").modal("show");
+                    // $("#success").modal("show");
+                    reloadPage();
                 } else {
                     $("#failure").modal("show");
                 }
-                $("#table").bootstrapTable("refresh");
-                //initCharts();
+                // $("#table").bootstrapTable("refresh");
+
             });
         }
+    }
+
+    function deleteWorkingInformation() {
+        const rows = $table.bootstrapTable("getSelections");
+        if (rows.length == 0) {
+            window.alert("No row is selected.");
+        } else {
+            const pjnames = rows.map((value) => {
+                return value.pj_name
+            });
+
+            $.ajax({
+                type: "POST",
+                async: false,
+                contentType: "application/json", //内容类型
+                dataType: "json",
+                url: "/deletepj",
+                data: JSON.stringify(pjnames),
+                success: function (json) {
+
+                    if (json.result == 1) {
+                        reloadPage();
+                    }
+                    else {
+                        window.alert("Delete failure, please try again later.");
+                    }
+                }
+            });
+
+           
+        }
+
     }
 </script>
 
