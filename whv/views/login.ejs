@@ -29,7 +29,7 @@
 
     <div class="limiter">
         <div class="container-login100" style="background-image: url('/img/bg.jpg');">
-            <div class="wrap-login100" style="margin-top: -80px;">
+            <div class="wrap-login100">
                 <div class="login100-form">
                     <span class="login100-form-logo">
                         <i class="zmdi zmdi-landscape"></i>
@@ -102,10 +102,15 @@
                 }, (json) => {
                     
                     if (json.result == 1) {
-                        window.location.href = "/";
-                    }
-                    else {
-                        alert("Username or password may be wrong, please try again later.");
+                        if (json.level == 0) {
+                            window.location.href = "/";
+                        }
+                        else {
+                            window.location.href = "/admin.html";
+                        }
+                        
+                    } else {
+                        window.alert("Username or password may be wrong, please try again later.");
                     }
                 });
             }

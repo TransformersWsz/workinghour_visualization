@@ -5,6 +5,15 @@ module.exports = (sequelize, Sequelize) => {
         },
         pj_name: {
             type: Sequelize.STRING
+        },
+        pj_date: {
+            type: Sequelize.DATEONLY
+        },
+        pj_leader: {
+            type: Sequelize.STRING
+        },
+        pj_instruction: {
+            type: Sequelize.STRING
         }
     }, {
         timestamps: false,

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        index
+    </title>
+    <link type="text/css" rel='stylesheet' href='/css/bootstrap.min.css' />
+    <link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+    <link type="text/css" rel='stylesheet' href='/css/bootstrap-table.min.css' />
+    <link rel="icon" type="image/png" href="/img/icons/favicon.ico" />
+
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap-datetimepicker.min.js" charset="UTF-8"></script>
+
+    <script type="text/javascript" src="/js/bootstrap-table.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap-table-en-US.min.js"></script>
+
+    <script type="text/javascript" src="/js/bootstrap-editable.js"></script>
+    <script type="text/javascript" src="/js/bootstrap-table-editable.min.js"></script>
+    <script type="text/javascript" src="/js/combodate.js"></script>
+    <script type="text/javascript" src="/js/moment.js"></script>
+
+
+    <script type="text/javascript" src="/js/bootstrap-table-toolbar.js"></script>
+    <script type="text/javascript" src="/js/echarts.min.js"></script>
+    <script type="text/javascript" src="/js/method.js"></script>
+
+    <style>
+
+        .out {
+            margin-left: 20px;
+            margin-right: 20px;
+            margin-bottom: 50px;
+        }
+
+        #rows {
+            color: red;
+            font-size: 20px;
+            font-weight: 900;
+        }
+    </style>
+
+</head>
+
+<body>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse  navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">Bosch Home</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <!-- <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">Home</a></li>
+
+                    <li><a href="#contact">Contact</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                            aria-expanded="false">Dropdown <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Action</a></li>
+                            <li><a href="#">Another action</a></li>
+
+                        </ul>
+                    </li>
+                </ul> -->
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/logout">Log out</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <p style="height: 50px"></p>
+
+
+    <div id="toolbar" class="btn-group">
+        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal3">
+            <i class="glyphicon glyphicon-plus"></i>
+        </button>
+        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#deletemodal" onclick="getRows()">
+            <i class="glyphicon glyphicon-minus"></i>
+        </button>
+    </div>
+
+    <!-- 删除项目信息 -->
+    <div class="modal fade" id="deletemodal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Delete Working Information</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure to delete these working information : <span id="rows"></span>? If you delete these projects, project members' information which is related to these projects will also be delete. Be careful!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" id="del" onclick="deleteWorkingInformation()">delete</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+
+    <!--新增项目信息-->
+    <div class="modal fade" id="modal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Add Project Information</h4>
+                </div>
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label>Project Name</label>
+                        <input id="pj_name" type="text" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dtp_input2">Date</label>
+                        <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd"
+                            data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
+                            <input id="pj_date" class="form-control" size="16" type="text" value="" readonly>
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        </div>
+                        <input type="hidden" id="dtp_input2" value="" /><br />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Person in charge</label>
+                        <input id="pj_leader" type="text" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Project instruction</label>
+                        <input id="pj_instruction" type="text" class="form-control">
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="submit" onclick="addProjectInformation()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="failure" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Failure</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Add new working information failure.Please try it again.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div class="out">
+        <table id="table" data-editable-emptytext="---"></table>
+    </div>
+
+
+
+</body>
+<script>
+    var $table = $('#table');
+    var count = 0;
+
+    function checkInputExceptDate(value) {
+        if (value == "" || value == undefined) {
+            return "The input cannot be empty."
+        }
+    }
+
+    function getRows() {
+        const rows = $table.bootstrapTable("getSelections");
+        var info = "";
+        for (let i = 0; i < rows.length; i++) {
+            if (i != rows.length - 1) {
+                info += rows[i].pj_name + " , ";
+            } else {
+                info += rows[i].pj_name;
+            }
+        }
+        $("#rows").html(info);
+    }
+
+    function resetModal() {
+        $("#pj_name").val("");
+        $("#pj_date").val("");
+    }
+
+
+    $(function () {
+
+        $('.form_date').datetimepicker({
+            weekStart: 1,
+            todayBtn: 1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 2,
+            minView: 2
+        });
+
+        $("#modal3").on("hide.bs.modal", () => {
+            count++;
+            if (count == 2) {
+                resetModal();
+                count = 0;
+            }
+        });
+
+
+        var otable = new tableinit();
+        otable.init();
+
+    });
+
+    var tableinit = function () {
+        var otableinit = new Object();
+        otableinit.init = function () {
+            $table.bootstrapTable({
+                toolbar: "#toolbar",
+                showRefresh: true,
+                showColumns: true,
+                search: true,
+                searchOnEnterKey: true,
+                url: "/project",
+                method: 'get',
+                cache: false,
+                striped: true,
+                pagination: true,
+                pageNumber: 1,
+                pageSize: 10,
+                pageList: [5, 10, 20, 50],
+                showFullScreen: true,
+                columns: [
+                    {
+                        checkbox: true
+                    },
+                    {
+                        title: "Project",
+                        field: "pj_name",
+                        editable: {
+                            type: 'text',
+                            title: 'Project Name',
+                            validate: checkInputExceptDate
+                        }
+                    },
+
+                    {
+                        title: "Date",
+                        field: "pj_date",
+                        editable: {
+                            type: 'combodate',
+                            title: 'Date',
+                            format: 'YYYY-MM-DD',
+                            viewformat: 'YYYY-MM-DD',
+                            template: 'YYYY-MM-DD',
+                            combodate: {
+                                minYear: 1920,
+                                maxYear: 2050,
+                                minuteStep: 1
+                            }
+                        }
+                    },
+
+                    {
+                        title: "Person in charge",
+                        field: "pj_leader",
+                        editable: {
+                            type: 'text',
+                            title: 'Person in charge',
+                            validate: checkInputExceptDate
+                        }
+                    },
+
+                    {
+                        title: "Project instruction",
+                        field: "pj_instruction",
+                        editable: {
+                            type: 'textarea',
+                            title: 'Project instruction',
+                            validate: checkInputExceptDate
+                        }
+                    },
+                ],
+                onEditableSave: function(field, row, oldValue, $el){
+                    
+                    
+                    // 更改项目时间
+                    if (field == "pj_date") {
+                        const checkDateRes = checkDate(row[field]);
+                        if (checkDateRes == false) {
+                            window.alert("Illegal date!");
+                            $('#table').bootstrapTable('refresh');
+                        }
+                        else {
+                            const jsondata = {
+                                pj_name: row.pj_name,
+                                newValue : row[field]
+                            };
+                            $.ajax({
+                                type: "post",
+                                url: "/updatepjdate",
+                                contentType:"application/json",
+                                data: JSON.stringify(jsondata),
+                                dataType: 'JSON',
+                                success:function(res){
+                                    if(res.result == 0){
+                                        window.alert("Update project date failure. Please try it again later.");
+                                    }
+                                    $('#table').bootstrapTable('refresh');
+                                }
+                            });
+                        }
+                    }
+                    else {
+                        
+                        const jsondata = {};
+                        jsondata.pj_name = row.pj_name;
+                        jsondata.pj_leader = row.pj_leader;
+                        jsondata.pj_instruction = row.pj_instruction;
+                        jsondata.isPjNameField = 0;
+
+                        if (field == "pj_name") {
+                            jsondata.selectColumn = oldValue;
+                            jsondata.isPjNameField = 1;
+                        }
+                        else {
+                            jsondata.selectColumn = row.pj_name;
+                        }
+
+
+                        $.ajax({
+                            type: "post",
+                            url: "/updatepjexceptdate",
+                            contentType:"application/json",
+                            data: JSON.stringify(jsondata),
+                            dataType: 'JSON',
+                            success:function(res){
+                                if(res.result == 0){
+                                    window.alert("Update project failure. Please try it again later.");
+                                }
+                                if(res.result == 2){
+                                    window.alert("Duplicate project name.");
+                                }
+                                $('#table').bootstrapTable('refresh');
+                            }
+                        });
+                    }
+                    
+                }
+
+            });
+        };
+        return otableinit;
+    };
+
+
+    function validate() {
+        if ($("#pj_name").val() == "") {
+            window.alert("Please input project name!");
+            return false;
+        }
+        if ($("#pj_date").val() == "") {
+            window.alert("Please select date!");
+            return false;
+        }
+        if ($("#pj_leader").val() == "") {
+            window.alert("Please input person in charge!");
+            return false;
+        }
+        if ($("#pj_instruction").val() == "") {
+            window.alert("Please input project instruction in charge!");
+            return false;
+        }
+        return true;
+    }
+
+    function addProjectInformation() {
+        const validateRes = validate();
+        if (validateRes == true) {
+            $.post("/addproject", {
+                pj_name: $("#pj_name").val(),
+                pj_date: $("#pj_date").val(),
+                pj_leader: $("#pj_leader").val(),
+                pj_instruction: $("#pj_instruction").val()
+            }, (json) => {
+                $('#modal3').modal('hide');
+                if (json.result == 1) {
+                    $('#table').bootstrapTable('refresh');
+                } else {
+                    window.alert("Duplicate project name!");
+                }
+            });
+        }
+    }
+
+    function deleteWorkingInformation() {
+        const rows = $table.bootstrapTable("getSelections");
+        if (rows.length == 0) {
+            window.alert("No row is selected.");
+        } else {
+            const pjnames = rows.map((value) => {
+                return value.pj_name
+            });
+
+            $.ajax({
+                type: "POST",
+                async: false,
+                contentType: "application/json", //内容类型
+                dataType: "json",
+                url: "/deletepjs",
+                data: JSON.stringify(pjnames),
+                success: function (json) {
+                    $('#deletemodal').modal('hide');
+                    if (json.result == 1) {
+                        reloadPage("/admin.html");
+                        
+                    } else {
+                        window.alert("Delete failure, please try again later.");
+                    }
+                    
+                }
+            });
+
+
+        }
+
+    }
+</script>
+
+</html>

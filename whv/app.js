@@ -32,7 +32,7 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
-	if (req.path == "/login") {
+	if (req.path == "/login" && req.body.username != null && req.body.password != null) {
 		next();
 	}
 	else {

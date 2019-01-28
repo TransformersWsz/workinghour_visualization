@@ -11,6 +11,9 @@ module.exports = (sequelize, Sequelize) => {
         },
         user_password: {
             type: Sequelize.STRING
+        },
+        user_level: {
+            type: Sequelize.INTEGER
         }
     }, {
         timestamps: false,
