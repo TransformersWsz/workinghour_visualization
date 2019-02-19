@@ -113,35 +113,14 @@ const formatUsernp = (result) => {
     return formatResult;
 }
 
-// 将工作信息按照项目归类起来
-const classifyProjects = (result) => {
-    const res = [];
-    const resultLength = result.length;
-    const isAppearBefore = result.map(() => { return 0; });
-
-    for (let i = 0; i < resultLength; i++) {
-        if (isAppearBefore[i] == 0) {
-            res.push(result[i]);
-            isAppearBefore[i] = 1;
-            for (let j = i+1; j < resultLength; j++) {
-                if (result[j].pj_name == result[i].pj_name) {
-                    res.push(result[j]);
-                    isAppearBefore[j] = 1;
-                }
-            }
-        }
-    }
-    return res;
-};
 
 const formatHybrid = (result) => {
     const formatWorkInfoResult = [];
-    const classifiedResult = classifyProjects(result);
-    const classifiedResultLength = classifiedResult.length;
-    for (let i = 0; i < classifiedResultLength; i++) {
+    const resultLength = result.length;
+    for (let i = 0; i < resultLength; i++) {
         const temp = {};
-        temp.pj_name = classifiedResult[i].pj_name;
-        matchMonth(temp, classifiedResult[i]);
+        temp.pj_name = result[i].pj_name;
+        matchMonth(temp, result[i]);
         formatWorkInfoResult.push(temp);
     }
     return formatWorkInfoResult;

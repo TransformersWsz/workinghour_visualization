@@ -12,6 +12,9 @@ module.exports = (sequelize, Sequelize) => {
         role_id: {
             type: Sequelize.INTEGER
         },
+        year_name: {
+            type: Sequelize.INTEGER
+        },
         month_name: {
             type: Sequelize.STRING
         },

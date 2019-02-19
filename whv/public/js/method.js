@@ -433,7 +433,7 @@ function getPjnameRolenameMonthnamehourtime(row) {
     return result;
 }
 
-function getOneRowWorkinfo(row) {
+function getOneRowWorkinfo(row, year_name) {
     const pj_name = row.pj_name;
     var role_id;
     var month_name = "";
@@ -527,6 +527,7 @@ function getOneRowWorkinfo(row) {
 
     return {
         pj_name: pj_name,
+        year_name: year_name,
         month_name: month_name,
         role_id: role_id,
         hour_time: hour_time

@@ -20,6 +20,12 @@
     <script type="text/javascript" src="/js/combodate.js"></script>
     <script type="text/javascript" src="/js/moment.js"></script>
 
+    <script type="text/javascript" src="/js/FileSaver.min.js"></script>
+    <script type="text/javascript" src="/js/xlsx.core.min.js"></script>
+    <script type="text/javascript" src="/js/tableExport.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap-table-export.min.js"></script>
+    
+
     <script type="text/javascript" src="/js/method.js"></script>
 
     <style>
@@ -67,6 +73,13 @@
             color: red;
             font-size: 20px;
             font-weight: 900;
+        }
+
+        .test {
+            margin-top: 20px;
+            margin-left: auto;
+            margin-right: auto;
+            width: 20%;
         }
     </style>
 
@@ -123,6 +136,21 @@
         <div id="secondright"></div>
     </div>
 
+    <div class="form-group test">
+        <select class="form-control" id="year_name">
+            <option value="2024">2024</option>
+            <option value="2023">2023</option>
+            <option value="2022">2022</option>
+            <option value="2021">2021</option>
+            <option value="2020">2020</option>
+            <option value="2019">2019</option>
+            <option value="2018">2018</option>
+            <option value="2017">2017</option>
+            <option value="2016">2016</option>
+            <option value="2015">2015</option>
+        </select>
+    </div>
+
 
     <div id="toolbar" class="btn-group">
         <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal3">
@@ -176,11 +204,26 @@
                         <select class="form-control" id="pj_id"></select>
                     </div>
 
-
-
                     <div class="form-group">
                         <label>Role</label>
                         <select class="form-control" id="role_id"></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Year</label>
+                        <select class="form-control" id="year_name_modal">
+                            <option value=""></option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                            <option value="2021">2021</option>
+                            <option value="2020">2020</option>
+                            <option value="2019">2019</option>
+                            <option value="2018">2018</option>
+                            <option value="2017">2017</option>
+                            <option value="2016">2016</option>
+                            <option value="2015">2015</option>
+                        </select>
                     </div>
 
                     <div class="form-group">
@@ -242,6 +285,7 @@
 
 </body>
 <script>
+
     var $table = $('#table');
 
     function getRows() {
@@ -283,14 +327,30 @@
     var rightChart;
     var secondLeftChart;
     var secondRightChart;
-    var xAxisData = Array(12).fill("");
+
     var projects = [];
-    var series = [];
+
+    // 重置图表
+    function refreshCharts() {
+        // 清空图表缓存
+        clearChartsCache();
+        // 重新获得图表数据
+        initCharts();
+    }
+
+    // 清空图表缓存
+    function clearChartsCache() {
+        leftChart.clear();
+        rightChart.clear();
+        secondLeftChart.clear();
+        secondRightChart.clear();
+    }
 
     // 显示左边柱状图
     function formatLeftChartsData(data) {
         const length = data.length;
         const proset = new Set();
+        var xAxisData = Array(12).fill("");
         for (let i = 0; i < length; i++) {
             proset.add(data[i].pj_name);
 
@@ -331,7 +391,6 @@
                 case "December":
                     xAxisData[11] = "December";
                     break;
-
             }
         }
 
@@ -353,10 +412,10 @@
                 pushDataArray(dataArray[j], projects[j], xAxisData[i], data);
             }
         }
-
+        var series = [];
         initSeries(series, projects, dataArray);
 
-        var option = {
+        const option = {
             title: {
                 text: "Bar",
                 x: "left"
@@ -418,17 +477,13 @@
 
     function pushDataArray(someData, someProject, month_name, data) {
         const dataLength = data.length;
-        var isExist = 0;
+        var sum = 0;
         for (let i = 0; i < dataLength; i++) {
             if (data[i].pj_name == someProject && data[i].month_name == month_name) {
-                isExist = 1;
-                someData.push(data[i].hour_time);
-                break;
+                sum += data[i].hour_time;
             }
         }
-        if (isExist == 0) {
-            someData.push(0);
-        }
+        someData.push(sum);
     }
 
     function initSeries(series, projects, dataArray) {
@@ -631,31 +686,6 @@
 
     // 格式化第二个右边柱状图数据
     function getFormattedDataOfRight2Chart(data) {
-        // const dataLength = data.length;
-        // const formattedDataOfRight2Chart = [];
-        // const rolename = [];
-        // for (let i = 0; i < dataLength; i++) {
-        //     let isAppearBefore = 0;
-        //     for (let j = 0; j < formattedDataOfRight2Chart.length; j++) {
-        //         if (data[i].role_name == formattedDataOfRight2Chart[j].name) {
-        //             isAppearBefore = 1;
-        //             formattedDataOfRight2Chart[j].value += data[i].hour_time;
-        //             break;
-        //         }
-        //     }
-        //     if (isAppearBefore == 0) {
-        //         rolename.push(data[i].role_name);
-        //         formattedDataOfRight2Chart.push({
-        //             value: data[i].hour_time,
-        //             name: data[i].role_name
-        //         });
-        //     }
-        // }
-        // const formatResult = [];
-        // formatResult.push(rolename);
-        // formatResult.push(formattedDataOfRight2Chart);
-        // return formatResult;
-
         const dataLength = data.length;
         const rolenames = [];
         const roles_hours = [];
@@ -719,22 +749,29 @@
         secondRightChart.setOption(option);
     }
 
-    function initCharts() {
+    function initChartsDom() {
         leftChart = echarts.init(document.getElementById("left"));
         rightChart = echarts.init(document.getElementById("right"));
+
+        secondLeftChart = echarts.init(document.getElementById("secondleft"));
+        secondRightChart = echarts.init(document.getElementById("secondright"));
+    }
+
+    function initCharts() {
+        const year_name = getYear_name();
         
-        $.get("/chartsdata", (data) => {
+        $.get("/chartsdata", {year_name: year_name}, (data) => {
             formatLeftChartsData(data);
             formatRightChartsData(data);
         });
 
-        secondLeftChart = echarts.init(document.getElementById("secondleft"));
-        $.get("/monthhourtime", (data) => {
+        
+        $.get("/monthhourtime", {year_name: year_name}, (data) => {
             formatSecondLeftChartsData(data);
         });
 
-        secondRightChart = echarts.init(document.getElementById("secondright"));
-        $.get("/rolehourtime", (data) => {
+        
+        $.get("/rolehourtime", {year_name: year_name}, (data) => {
             formatSecondRightChartsData(data);
         });
     }
@@ -753,23 +790,45 @@
         }
     }
 
+    // 获取当前年份
+    function getYear_name() {
+        return parseInt($("#year_name").val());
+    }
+
     $(function () {
         $("#modal3").on("hide.bs.modal", function () {
             resetModal();
         });
 
+        initChartsDom();
         initCharts();
 
         window.onresize = function () {
             rightChart.resize();
             leftChart.resize();
+            
+            secondLeftChart.resize();
+            secondRightChart.resize();
         };
 
         getRoles();
         getProjects();
 
+        // 设定初始年份
+        const now_year = new Date().getFullYear();
+        $("#year_name").val(now_year);
+
+        // 设定模态框年份
+        $("#year_name_modal").val(now_year);
+
         var otable = new tableinit();
         otable.init();
+
+        $("#year_name").change(() => {
+            $("#year_name_modal").val(getYear_name);
+            $('#table').bootstrapTable('refresh');
+            refreshCharts();
+        });
     });
 
     var tableinit = function () {
@@ -806,6 +865,12 @@
                 pageNumber: 1,
                 pageSize: 10,
                 pageList: [5, 10, 20, 50],
+                queryParams: (params) => {
+                    var year_name = $("#year_name").val();
+                    year_name = parseInt(year_name);
+                    params.year_name = year_name;
+                    return params;
+                },
                 rowStyle: function (row, index) {
                     if (index === 0 || index === 1 || index === 2) {
                         return {
@@ -1079,6 +1144,7 @@
                             if (row.pj_name == "Private leave" || row.pj_name == "Training" || row.pj_name ==
                                 "Administration") {
                                 jsondata.np_name = row.pj_name;
+                                jsondata.year_name = getYear_name();
                                 jsondata.month_name = getMonthnameFromMonthColumn(field);
                                 jsondata.hour_time = row[field];
 
@@ -1089,12 +1155,14 @@
                                     data: JSON.stringify(jsondata),
                                     dataType: 'JSON',
                                     success: function (res) {
-                                        if (res.result == 1) {} else {
+                                        if (res.result == 1) {
+                                        } else {
                                             window.alert(
                                                 "Update failure, please try it again later."
                                             );
                                             $('#table').bootstrapTable('refresh');
                                         }
+                                        
                                     }
                                 });
                             }
@@ -1103,6 +1171,7 @@
                                 jsondata.pj_name = row.pj_name;
                                 // 如果更新的是 role
                                 if (field.indexOf("_role_") != -1) {
+                                    jsondata.year_name = getYear_name();
                                     const result_monthName_rightField =
                                         getMonthnameAndRightHourtimeFromMonthColumnRoleId(field);
                                     jsondata.month_name = result_monthName_rightField[0];
@@ -1117,17 +1186,18 @@
                                         data: JSON.stringify(jsondata),
                                         dataType: 'JSON',
                                         success: function (res) {
-                                            if (res.result == 1) {} else {
-                                                window.alert(
-                                                    "Update failure, please try it again later."
-                                                );
-                                                $('#table').bootstrapTable('refresh');
+                                            if (res.result == 1) {
+                                                refreshCharts();
+                                            } else {
+                                                window.alert("Update failure, please try it again later.");
                                             }
+                                            $('#table').bootstrapTable('refresh');
                                         }
                                     });
                                 }
                                 // 如果更新的是 hour_time
                                 else {
+                                    jsondata.year_name = getYear_name();
                                     const result_monthName_leftField =
                                         getMonthnameAndLeftRoleIdFromMonthColumnRoleId(field);
                                     jsondata.month_name = result_monthName_leftField[0];
@@ -1142,12 +1212,12 @@
                                         data: JSON.stringify(jsondata),
                                         dataType: 'JSON',
                                         success: function (res) {
-                                            if (res.result == 1) {} else {
-                                                window.alert(
-                                                    "Update failure, please try it again later."
-                                                );
-                                                $('#table').bootstrapTable('refresh');
+                                            if (res.result == 1) {
+                                                refreshCharts();
+                                            } else {
+                                                window.alert("Update failure, please try it again later.");
                                             }
+                                            $('#table').bootstrapTable('refresh');
                                         }
                                     });
                                 }
@@ -1155,11 +1225,17 @@
                             //window.alert(JSON.stringify(jsondata));
                         }
                     }
-
-
-
-
+                },
+                
+                showExport: true,
+                exportDataType: "all",
+                exportOptions: {  
+                    ignoreColumn: [0],            //忽略某一列的索引  
+                    fileName: 'EffordRecord',              //文件名称设置  
+                    worksheetName: 'sheet1',          //表格工作区名称
+                    styles: ['background-color', 'color', 'font-size', 'font-weight']
                 }
+            
             });
         };
         return otableinit;
@@ -1189,23 +1265,27 @@
 
     function validate() {
         if ($("#pj_id").val() == "") {
-            alert("Please input project name!");
+            window.alert("Please input project name!");
             return false;
         }
         if ($("#role_id").val() == "0") {
-            alert("Please select one role!");
+            window.alert("Please select one role!");
+            return false;
+        }
+        if ($("#year_name_modal").val() == "") {
+            window.alert("Please select one year");
             return false;
         }
         if ($("#month_name").val() == "") {
-            alert("Please select one month!");
+            window.alert("Please select one month!");
             return false;
         }
         if ($("#hour_time").val() == "") {
-            alert("Please input hour!");
+            windoiw.alert("Please input hour!");
             return false;
         }
         if (isNaN($("#hour_time").val()) == true) {
-            alert("Please input illegal hour!");
+            window.alert("Please input illegal hour!");
             return false;
         }
         return true;
@@ -1219,6 +1299,7 @@
             $.post("/addworkinfo", {
                 pj_id: $("#pj_id").val(),
                 role_id: parseInt($("#role_id").val()),
+                year_name: parseInt($("#year_name_modal").val()),
                 month_name: $("#month_name").val(),
                 hour_time: parseFloat($("#hour_time").val())
             }, (json) => {
@@ -1228,22 +1309,25 @@
                 } else {
                     $('#modal3').modal('hide');
                     if (json.result == 1) {
-                        reloadPage("/");
+                        $('#table').bootstrapTable('refresh');
+                        refreshCharts();
                     } else {
                         $("#failure").modal("show");
                     }
+                    
                 }
             });
         }
     }
 
     function deleteWorkingInformation() {
+        const year_name = parseInt($("#year_name").val());
         const rows = $table.bootstrapTable("getSelections");
         if (rows.length == 0) {
             window.alert("No row is selected.");
         } else {
             const workinfos = rows.map((row) => {
-                return getOneRowWorkinfo(row);
+                return getOneRowWorkinfo(row, year_name);
             });
 
             $.ajax({
@@ -1255,7 +1339,8 @@
                 success: function (json) {
                     $('#deletemodal').modal('hide');
                     if (json.result == 1) {
-                        reloadPage("/");
+                        $('#table').bootstrapTable('refresh');
+                        refreshCharts();
                     } else {
                         window.alert("Delete failure, please try again later.");
                     }

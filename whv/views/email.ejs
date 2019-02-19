@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Administration
+    </title>
+    <link type="text/css" rel='stylesheet' href='/css/bootstrap.min.css' />
+    <link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+    <link type="text/css" rel='stylesheet' href='/css/bootstrap-table.min.css' />
+    <link rel="icon" type="image/png" href="/img/icons/favicon.ico" />
+
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap-datetimepicker.min.js" charset="UTF-8"></script>
+
+    <script type="text/javascript" src="/js/bootstrap-table.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap-table-en-US.min.js"></script>
+
+    <script type="text/javascript" src="/js/bootstrap-editable.js"></script>
+    <script type="text/javascript" src="/js/bootstrap-table-editable.min.js"></script>
+    <script type="text/javascript" src="/js/combodate.js"></script>
+    <script type="text/javascript" src="/js/moment.js"></script>
+
+
+    <script type="text/javascript" src="/js/bootstrap-table-toolbar.js"></script>
+    <script type="text/javascript" src="/js/echarts.min.js"></script>
+    <script type="text/javascript" src="/js/method.js"></script>
+
+    <style>
+
+        .out {
+            margin-left: 20px;
+            margin-right: 20px;
+            margin-bottom: 50px;
+        }
+        
+        .test {
+            width: 20%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+
+</head>
+
+<body>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse  navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/admin.html">Bosch Home</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="/admin.html">Project</a></li>
+
+                    <li><a href="/swhphh.html">Standard Working Hours & Salary Pay Hours</a></li>
+
+                    <li class="active"><a href="/email.html">Email Members</a></li>
+
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                            aria-expanded="false">Dropdown <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Action</a></li>
+                            <li><a href="#">Another action</a></li>
+
+                        </ul>
+                    </li>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/logout">Log out</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <p style="height: 150px"></p>
+
+    
+
+    <div id="toolbar" class="btn-group">
+        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal3">
+            <i class="glyphicon glyphicon-plus"></i>
+        </button>
+    </div>
+
+    <!--新增收件人信息-->
+    <div class="modal fade" id="modal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Add Receiver Name And Email</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Receiver Name</label>
+                        <input id="receiver_name" type="text" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Receiver Email</label>
+                        <input id="receiver_email" type="text" class="form-control">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="submit" onclick="addReceiverInformation()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="out">
+        <table id="table" data-editable-emptytext="--"></table>
+    </div>
+
+
+
+</body>
+<script>
+    var $table = $('#table');
+    var count = 0;
+
+
+    $(function () {
+        $("#modal3").on("hide.bs.modal", () => {
+            resetModal();
+        });
+
+        var otable = new tableinit();
+        otable.init();
+    });
+
+    var tableinit = function () {
+        var otableinit = new Object();
+        otableinit.init = function () {
+            $table.bootstrapTable({
+                toolbar: "#toolbar",
+                showRefresh: true,
+                showColumns: true,
+                search: true,
+                searchOnEnterKey: true,
+                url: "/getinform",
+                method: 'post',
+                cache: false,
+                striped: true,                
+                showFullScreen: true,
+                
+                columns: [
+                    {
+                        title: "Receiver Name",
+                        field: "receiver_name",
+                        editable: {
+                            type: 'text',
+                            title: 'Receiver Name'
+                        }
+                    },
+
+                    {
+                        title: "Receiver Email",
+                        field: "receiver_email",
+                        editable: {
+                            type: 'text',
+                            title: 'Receiver Email'
+                        }
+                    }
+                ],
+                onEditableSave: (field, row, oldValue, $el) => {}
+            });
+        };
+        return otableinit;
+    };
+
+    function resetModal() {
+        $("#receiver_name").val("");
+        $("#receiver_email").val("");
+    }
+    
+    function validate() {
+        if ($("#receiver_name").val() == "") {
+            window.alert("Please input receiver name!");
+            return false;
+        }
+        if ($("#receiver_email").val().indexOf("@cn.bosch.com") == -1) {
+            window.alert("Please input Bosch email!");
+            return false;
+        }
+        return true;
+    }
+
+    function addReceiverInformation() {
+        const validateRes = validate();
+        if (validateRes == true) {
+            $.post("/addreceiverinformation", {
+                receiver_name: $("#receiver_name").val(),
+                receiver_email: $("#receiver_email").val()
+            }, (json) => {
+                $('#modal3').modal('hide');
+                if (json.result == 1) {
+                    $('#table').bootstrapTable('refresh');
+                } else {
+                    window.alert("Duplicate receiver name or email!");
+                }
+            });
+        }
+    }
+
+
+    
+</script>
+
+</html>

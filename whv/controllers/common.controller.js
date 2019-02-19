@@ -12,13 +12,13 @@ const getProjects = (db, req, res, next) => {
 // 普通成员和管理员都可以添加自己的工作信息
 const addWorkInfo = (db, req, res, next) => {
 
-    db.sequelize.query("select hy_id from hybrid where user_id = ? and pj_id = ? and role_id = ? and month_name = ?", {
-        replacements: [req.session.user.user_id, req.body.pj_id, req.body.role_id, req.body.month_name],
+    db.sequelize.query("select hy_id from hybrid where user_id = ? and pj_id = ? and role_id = ? and year_name = ? and month_name = ?", {
+        replacements: [req.session.user.user_id, req.body.pj_id, req.body.role_id, req.body.year_name, req.body.month_name],
         type: db.sequelize.QueryTypes.SELECT
     }).then((selectHyRes) => {
         if (selectHyRes.length == 0) {
-            db.sequelize.query("insert into hybrid(user_id, pj_id, role_id, month_name, hour_time) values(?, ?, ?, ?, ?)", {
-                replacements: [req.session.user.user_id, req.body.pj_id, req.body.role_id, req.body.month_name, req.body.hour_time],
+            db.sequelize.query("insert into hybrid(user_id, pj_id, role_id, year_name, month_name, hour_time) values(?, ?, ?, ?, ?, ?)", {
+                replacements: [req.session.user.user_id, req.body.pj_id, req.body.role_id, req.body.year_name, req.body.month_name, req.body.hour_time],
                 type: db.sequelize.QueryTypes.INSERT
             })
             .then((hybrid_instance) => {
@@ -47,8 +47,8 @@ const deleteOneWorkInfo = (db, workInfo, req, res) => {
         type: db.sequelize.QueryTypes.SELECT
     })
     .then((selectPjRes) => {
-        db.sequelize.query("delete from hybrid where user_id = ? and pj_id = ? and role_id = ? and month_name = ? and hour_time = ?", {
-            replacements: [req.session.user.user_id, selectPjRes[0].pj_id, workInfo.role_id, workInfo.month_name, workInfo.hour_time],
+        db.sequelize.query("delete from hybrid where user_id = ? and pj_id = ? and role_id = ? and year_name = ? and month_name = ? and hour_time = ?", {
+            replacements: [req.session.user.user_id, selectPjRes[0].pj_id, workInfo.role_id, workInfo.year_name, workInfo.month_name, workInfo.hour_time],
             type: db.sequelize.QueryTypes.DELETE
         })
         .then((deleteHyRes) => {
@@ -66,17 +66,17 @@ const deleteOneWorkInfo = (db, workInfo, req, res) => {
 // 普通成员和管理员都可以获得自己的工作信息
 const getWorkInfo = (db, req, res, next) => {
     var formatWorkInfoResult = [];
-    db.sequelize.query("select n.np_name, usernp.month_name, usernp.hour_time from usernp join nonproject n on usernp.np_id = n.np_id where user_id = ?", {
-        replacements: [req.session.user.user_id],
+    db.sequelize.query("select n.np_name, usernp.month_name, usernp.hour_time from usernp join nonproject n on usernp.np_id = n.np_id where user_id = ? and year_name = ?", {
+        replacements: [req.session.user.user_id, req.query.year_name],
 		type: db.sequelize.QueryTypes.SELECT
     })
     .then((selectUsernpRes) => {
         const formatUsernpRes = Method.formatUsernp(selectUsernpRes);
         Method.mergeTwoArray(formatUsernpRes, formatWorkInfoResult);
 
-        const sql = "select p.pj_name, hybrid.role_id, hybrid.month_name, hybrid.hour_time from hybrid join project p on hybrid.pj_id = p.pj_id where user_id = ?";
+        const sql = "select temp.pj_name, temp.role_id, temp.month_name, temp.hour_time from (select p.pj_name, hybrid.role_id, hybrid.month_name, hybrid.hour_time from hybrid join project p on hybrid.pj_id = p.pj_id where user_id = ? and year_name = ?) as temp order by temp.pj_name, temp.month_name;";
         db.sequelize.query(sql, {
-            replacements: [req.session.user.user_id],
+            replacements: [req.session.user.user_id, req.query.year_name],
             type: db.sequelize.QueryTypes.SELECT
         })
         .then((selectHybridRes) => {
@@ -164,8 +164,8 @@ const updateUsernp = (db, req, res, next) => {
     })
     .then((selectUsernpRes) => {
         const np_id = selectUsernpRes[0].np_id;
-        db.sequelize.query("update usernp set hour_time = ? where user_id = ? and np_id = ? and month_name = ?", {
-            replacements: [req.body.hour_time, req.session.user.user_id, np_id, req.body.month_name],
+        db.sequelize.query("update usernp set hour_time = ? where user_id = ? and np_id = ? and year_name = ? and month_name = ?", {
+            replacements: [req.body.hour_time, req.session.user.user_id, np_id, req.body.year_name, req.body.month_name],
             type: db.sequelize.QueryTypes.UPDATE
         })
         .then((updateUsernpRes) => {
@@ -190,8 +190,8 @@ const updateHybridRoleid = (db, req, res, next) => {
     })
     .then((selectPjRes) => {
         const pj_id = selectPjRes[0].pj_id;
-        db.sequelize.query("update hybrid set role_id = ? where user_id = ? and pj_id = ? and role_id = ? and month_name = ? and hour_time = ?", {
-            replacements: [req.body.role_id, req.session.user.user_id, pj_id, req.body.old_role_id, req.body.month_name, req.body.hour_time],
+        db.sequelize.query("update hybrid set role_id = ? where user_id = ? and pj_id = ? and role_id = ? and year_name = ? and month_name = ? and hour_time = ?", {
+            replacements: [req.body.role_id, req.session.user.user_id, pj_id, req.body.old_role_id, req.body.year_name, req.body.month_name, req.body.hour_time],
             type: db.sequelize.QueryTypes.UPDATE
         })
         .then((updateHybridRes) => {
@@ -215,8 +215,8 @@ const updateHybridHourtime = (db, req, res, next) => {
     })
     .then((selectPjRes) => {
         const pj_id = selectPjRes[0].pj_id;
-        db.sequelize.query("update hybrid set hour_time = ? where user_id = ? and pj_id = ? and role_id = ? and month_name = ? and hour_time = ?", {
-            replacements: [req.body.hour_time, req.session.user.user_id, pj_id, req.body.role_id, req.body.month_name, req.body.old_hour_time],
+        db.sequelize.query("update hybrid set hour_time = ? where user_id = ? and pj_id = ? and role_id = ? and year_name = ? and month_name = ? and hour_time = ?", {
+            replacements: [req.body.hour_time, req.session.user.user_id, pj_id, req.body.role_id, req.body.year_name, req.body.month_name, req.body.old_hour_time],
             type: db.sequelize.QueryTypes.UPDATE
         })
         .then((updateHybridRes) => {

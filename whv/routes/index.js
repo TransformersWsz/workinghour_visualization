@@ -18,9 +18,9 @@ router.get("/gs", (req, res, next) => {
 });
 
 router.get("/chartsdata", (req, res, next) => {
-	const sql = "select p.pj_name, hybrid.month_name, r.role_name, hybrid.hour_time from hybrid join project p on hybrid.pj_id = p.pj_id join role r on hybrid.role_id = r.role_id where user_id = ?";
+	const sql = "select p.pj_name, hybrid.month_name, r.role_name, hybrid.hour_time from hybrid join project p on hybrid.pj_id = p.pj_id join role r on hybrid.role_id = r.role_id where user_id = ? and hybrid.year_name = ?";
 	db.sequelize.query(sql, {
-			replacements: [req.session.user.user_id],
+			replacements: [req.session.user.user_id, req.query.year_name],
 			type: db.sequelize.QueryTypes.SELECT
 		})
 		.then(result => {
@@ -29,8 +29,8 @@ router.get("/chartsdata", (req, res, next) => {
 });
 
 router.get("/rolehourtime", (req, res, next) => {
-	db.sequelize.query("select r.role_name, sum(hybrid.hour_time) as totalhourtime from hybrid join role r on hybrid.role_id = r.role_id where user_id = ? group by r.role_name", {
-		replacements: [req.session.user.user_id],
+	db.sequelize.query("select r.role_name, sum(hybrid.hour_time) as totalhourtime from hybrid join role r on hybrid.role_id = r.role_id where user_id = ? and hybrid.year_name = ? group by r.role_name", {
+		replacements: [req.session.user.user_id, req.query.year_name],
 		type: db.sequelize.QueryTypes.SELECT
 	})
 	.then((result) => {
@@ -39,8 +39,8 @@ router.get("/rolehourtime", (req, res, next) => {
 });
 
 router.get("/monthhourtime", (req, res, next) => {
-	db.sequelize.query("select month_name, sum(hour_time) as totalhourtime from hybrid where user_id = ? group by month_name", {
-		replacements: [req.session.user.user_id],
+	db.sequelize.query("select month_name, sum(hour_time) as totalhourtime from hybrid where user_id = ? and hybrid.year_name = ? group by month_name", {
+		replacements: [req.session.user.user_id, req.query.year_name],
 		type: db.sequelize.QueryTypes.SELECT
 	})
 	.then((result) => {
@@ -67,10 +67,46 @@ router.get('/', function (req, res, next) {
 	res.render('index');
 });
 
-/* GET home page. */
-router.get("/admin.html", function (req, res, next) {
+/* GET admin.html page. */
+router.get("/admin.html", AdminController.checkAdminAuth, (req, res, next) => {
 	res.render("admin");
 });
+
+/* GET swhsph.html page. */
+router.get("/swhphh.html", AdminController.checkAdminAuth, (req, res, next) => {
+	res.render("swhphh");
+});
+
+/* GET email.html page. */
+router.get("/email.html", AdminController.checkAdminAuth, (req, res, next) => {
+	res.render("email");
+});
+
+// 获取收件人的邮件和姓名
+router.post("/getinform", AdminController.checkAdminAuth, (req, res, next) => {
+	AdminController.getInform(db, req, res, next);
+});
+
+// 添加收件人信息
+router.post("/addreceiverinformation", AdminController.checkAdminAuth, (req, res, next) => {
+	
+});
+
+// 获取每年的swh phh
+router.post("/getswhphh", AdminController.checkAdminAuth, (req, res, next) => {
+	AdminController.getSwhphh(db, req, res, next);
+});
+
+// 更新每年的 swh
+router.post("/updatessh", AdminController.checkAdminAuth, (req, res, next) => {
+	AdminController.updateSwh(db, req, res, next);
+});
+
+// 更新每年的 swh
+router.post("/updatephh", AdminController.checkAdminAuth, (req, res, next) => {
+	AdminController.updatePhh(db, req, res, next);
+});
+
 
 // login page
 router.get("/login.html", (req, res, next) => {

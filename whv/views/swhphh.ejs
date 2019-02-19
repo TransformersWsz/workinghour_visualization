@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Administration
+    </title>
+    <link type="text/css" rel='stylesheet' href='/css/bootstrap.min.css' />
+    <link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+    <link type="text/css" rel='stylesheet' href='/css/bootstrap-table.min.css' />
+    <link rel="icon" type="image/png" href="/img/icons/favicon.ico" />
+
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap-datetimepicker.min.js" charset="UTF-8"></script>
+
+    <script type="text/javascript" src="/js/bootstrap-table.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap-table-en-US.min.js"></script>
+
+    <script type="text/javascript" src="/js/bootstrap-editable.js"></script>
+    <script type="text/javascript" src="/js/bootstrap-table-editable.min.js"></script>
+    <script type="text/javascript" src="/js/combodate.js"></script>
+    <script type="text/javascript" src="/js/moment.js"></script>
+
+
+    <script type="text/javascript" src="/js/bootstrap-table-toolbar.js"></script>
+    <script type="text/javascript" src="/js/echarts.min.js"></script>
+    <script type="text/javascript" src="/js/method.js"></script>
+
+    <style>
+
+        .out {
+            margin-left: 20px;
+            margin-right: 20px;
+            margin-bottom: 50px;
+        }
+        
+        .test {
+            width: 20%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+
+</head>
+
+<body>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse  navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/admin.html">Bosch Home</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="/admin.html">Project</a></li>
+
+                    <li class="active"><a href="/swhphh.html">Standard Working Hours & Salary Pay Hours</a></li>
+
+                    <li><a href="/email.html">Email Members</a></li>
+
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                            aria-expanded="false">Dropdown <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Action</a></li>
+                            <li><a href="#">Another action</a></li>
+
+                        </ul>
+                    </li>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/logout">Log out</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <p style="height: 100px"></p>
+
+    <div class="form-group test">
+        <select class="form-control" id="year_id">
+            <option value="2024">2024</option>
+            <option value="2023">2023</option>
+            <option value="2022">2022</option>
+            <option value="2021">2021</option>
+            <option value="2020">2020</option>
+            <option value="2019">2019</option>
+            <option value="2018">2018</option>
+            <option value="2017">2017</option>
+            <option value="2016">2016</option>
+            <option value="2015">2015</option>
+        </select>
+    </div>
+
+    <div id="toolbar" class="btn-group">
+        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal3">
+            <i class="glyphicon glyphicon-plus"></i>
+        </button>
+    </div>
+
+    <!--新增工时信息-->
+    <div class="modal fade" id="modal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Add Year For Standard Working Hours & Public Holiday Hours</h4>
+                </div>
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label for="dtp_input2">Choose Year</label>
+                        <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy"
+                            data-link-field="dtp_input2" data-link-format="yyyy">
+                            <input id="year_id" class="form-control" size="16" type="text" value="" readonly>
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        </div>
+                        <input type="hidden" id="dtp_input2" value="" /><br />
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="submit" onclick="addYearInformation()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="out">
+        <table id="table" data-editable-emptytext="--"></table>
+    </div>
+
+
+
+</body>
+<script>
+    var $table = $('#table');
+    var count = 0;
+
+    function checkInputHour(value) {
+        if (isNaN(value) == true) {
+            return "illegal hour";
+        }
+    }
+
+    function getYear_id() {
+        return parseInt($("#year_id").val());
+    }
+
+    $(function () {
+
+        $('.form_date').datetimepicker({
+            autoclose: 1,
+            startView: 4,
+            minView: 4
+        });
+
+        $("#modal3").on("hide.bs.modal", () => {
+            count++;
+            if (count == 2) {
+                resetModal();
+                count = 0;
+            }
+        });
+
+        // 设定初始年份
+        const now_year = new Date().getFullYear();
+        $("#year_id").val(now_year);
+
+        $("#year_id").change(() => {
+            $('#table').bootstrapTable('refresh');
+        });
+
+
+        var otable = new tableinit();
+        otable.init();
+
+    });
+
+    var tableinit = function () {
+        var otableinit = new Object();
+        otableinit.init = function () {
+            $table.bootstrapTable({
+                toolbar: "#toolbar",
+                showRefresh: true,
+                showColumns: true,
+                search: true,
+                searchOnEnterKey: true,
+                url: "/getswhphh",
+                method: 'post',
+                cache: false,
+                striped: true,                
+                showFullScreen: true,
+                queryParams: (params) => {
+                    const year_id = getYear_id();
+                    params.year_id = year_id;
+                    return params;
+                },
+                columns: [
+                    {
+                        title: "Month",
+                        field: "month_name",
+                    },
+
+                    {
+                        title: "Standard Working Hours",
+                        field: "swh",
+                        editable: {
+                            type: 'text',
+                            title: 'Standard Working Hours',
+                            validate: checkInputHour
+                        }
+                    },
+
+                    {
+                        title: "Public Holiday Hours",
+                        field: "phh",
+                        editable: {
+                            type: 'text',
+                            title: 'Public Holiday Hours',
+                            validate: checkInputHour
+                        }
+                    },
+
+                    {
+                        title: "Salary Pay Hours",
+                        field: "sph"
+                    }
+                ],
+                onEditableSave: function (field, row, oldValue, $el) {
+                    const jsondata = {};
+                    jsondata.month_name = row["month_name"];
+                    jsondata.year_id = getYear_id();
+                    if (row["month_name"] == "total") {
+                        $('#table').bootstrapTable('refresh');
+                    }
+                    else {
+                        if (field == "swh") {
+                            jsondata.swh = row[field];
+
+                            $.ajax({
+                                type: "post",
+                                url: "/updatessh",
+                                contentType: "application/json",
+                                data: JSON.stringify(jsondata),
+                                dataType: 'JSON',
+                                success: function (res) {
+                                    if (res.result == 1) {
+                                    } else {
+                                        window.alert(
+                                            "Update failure, please try it again later."
+                                        );
+                                        
+                                    }
+                                    $('#table').bootstrapTable('refresh');
+                                }
+                            });
+                        }
+                        else {
+                            jsondata.phh = row[field];
+                            $.ajax({
+                                type: "post",
+                                url: "/updatephh",
+                                contentType: "application/json",
+                                data: JSON.stringify(jsondata),
+                                dataType: 'JSON',
+                                success: function (res) {
+                                    if (res.result == 1) {
+                                    } else {
+                                        window.alert(
+                                            "Update failure, please try it again later."
+                                        );
+                                        
+                                    }
+                                    $('#table').bootstrapTable('refresh');
+                                    
+                                }
+                            });
+                        }
+                    }
+                    
+                }
+
+            });
+        };
+        return otableinit;
+    };
+
+    function resetModal() {
+        $("#year_id").val("");
+    }
+
+
+    function addYearInformation() {
+        $.post("/addyearid", {
+            year_id: $("#year_id").val()
+        }, (json) => {
+            $('#modal3').modal('hide');
+            if (json.result == 1) {
+                $('#table').bootstrapTable('refresh');
+            } else {
+                window.alert("Duplicate year!");
+            }
+        });
+    }
+</script>
+
+</html>

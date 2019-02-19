@@ -42,6 +42,7 @@ const addProject = (db, req, res, next) => {
 	});
 };
 
+// 获取项目信息
 const getProject = (db, req, res, next) => {
     db.sequelize.query("select pj_name, pj_date, pj_leader, pj_instruction from project", {
         type: db.sequelize.QueryTypes.SELECT
@@ -50,6 +51,75 @@ const getProject = (db, req, res, next) => {
         res.json(selectPjRes);
     });
 }
+
+// 获取每年的swh phh
+const getSwhphh = (db, req, res, next) => {
+    db.sequelize.query("select month_name, swh, phh, swh+phh as sph from sshour where year_id = ?", {
+        replacements: [req.body.year_id],
+        type: db.sequelize.QueryTypes.SELECT
+    })
+    .then((result) => {
+        db.sequelize.query("select sum(swh) as swh, sum(phh) as phh, sum(swh) + sum(phh) as sph from sshour where year_id = ?", {
+            replacements: [req.body.year_id],
+            type: db.sequelize.QueryTypes.SELECT
+        })
+        .then((sumRes) => {
+            sumRes[0].month_name = "total";
+            result.push(sumRes[0]);
+            res.json(result);
+        });
+    });
+};
+
+// 获取收件人的邮件和姓名
+const getInform = (db, req, res, next) => {
+    db.sequelize.query("select receiver_email, receiver_name from inform", {
+        type: db.sequelize.QueryTypes.SELECT
+    })
+    .then((result) => {
+        res.json(result);
+    });
+}
+
+// 添加收件人信息
+const addReceiverInformation = (db, req, res, next) => {
+    
+};
+
+// 更新每年的 swh
+const updateSwh = (db, req, res, next) => {
+    db.sequelize.query("update sshour set swh = ? where year_id = ? and month_name = ?", {
+        replacements: [req.body.swh, req.body.year_id, req.body.month_name],
+        type: db.sequelize.QueryTypes.UPDATE
+    }).then((update_sshour_instance) => {
+        res.json({
+            result: 1
+        });
+    })
+    .catch(() => {
+        res.json({
+            result: 0
+        });
+    });
+};
+
+// 更新每年的 phh
+const updatePhh = (db, req, res, next) => {
+    db.sequelize.query("update sshour set phh = ? where year_id = ? and month_name = ?", {
+        replacements: [req.body.phh, req.body.year_id, req.body.month_name],
+        type: db.sequelize.QueryTypes.UPDATE
+    }).then((update_sshour_instance) => {
+        res.json({
+            result: 1
+        });
+    })
+    .catch(() => {
+        res.json({
+            result: 0
+        });
+    });
+};
+
 
 // 更改项目名称或者负责人或者简介
 const updatePjExceptDate = (db, req, res, next) => {
@@ -161,10 +231,14 @@ const test = (res) => {
 const adminController = {};
 adminController.checkAdminAuth = checkAdminAuth;
 adminController.getProject = getProject;
+adminController.getInform = getInform;
 adminController.updatePjDate = updatePjDate;
 adminController.deleteOnePj = deleteOnePj;
 adminController.addProject = addProject;
 adminController.updatePjExceptDate = updatePjExceptDate;
+adminController.getSwhphh = getSwhphh;
+adminController.updateSwh = updateSwh;
+adminController.updatePhh = updatePhh;
 adminController.test = test;
 
 module.exports = adminController;
