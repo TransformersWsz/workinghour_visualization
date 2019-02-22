@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Administration
+    </title>
+    <link type="text/css" rel='stylesheet' href='/css/bootstrap.min.css' />
+    <link type="text/css" rel='stylesheet' href='/css/bootstrap-table.min.css' />
+    <link rel="icon" type="image/png" href="/img/icons/favicon.ico" />
+
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap-table.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap-table-en-US.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap-table-toolbar.js"></script>
+    <script type="text/javascript" src="/js/echarts.min.js"></script>
+
+    <script type="text/javascript" src="/js/moment.js"></script>
+
+    <script type="text/javascript" src="/js/method.js"></script>
+
+    <style>
+        .out {
+            margin-left: 20px;
+            margin-right: 20px;
+            margin-bottom: 50px;
+        }
+        
+        .test {
+            margin-top: 20px;
+            width: 20%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #chart {
+            height: 420px;
+        }
+    </style>
+ 
+</head>
+
+<body>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse  navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand active" href="/statistic.html">Bosch Home</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="/admin.html">Project</a></li>
+
+                    <li><a href="/swhphh.html">Standard Working Hours & Salary Pay Hours</a></li>
+
+                    <li><a href="/email.html">Email Members</a></li>
+
+                    
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/logout">Log out</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <p style="height: 50px"></p>
+
+    <div id="chart"></div>
+
+    <div class="form-group test">
+        <select class="form-control" id="year_name">
+            <option value="2024">2024</option>
+            <option value="2023">2023</option>
+            <option value="2022">2022</option>
+            <option value="2021">2021</option>
+            <option value="2020">2020</option>
+            <option value="2019">2019</option>
+            <option value="2018">2018</option>
+            <option value="2017">2017</option>
+            <option value="2016">2016</option>
+            <option value="2015">2015</option>
+        </select>
+    </div>
+
+    <div id="toolbar" class="btn-group">
+        <button type="button" class="btn btn-default" onclick="exportExcel()">
+            <i class="glyphicon glyphicon-export"></i>
+        </button>
+
+    </div>
+
+    <div class="out">
+        <table id="table" data-editable-emptytext="--" data-show-fullscreen="true"></table>
+    </div>
+
+</body>
+<script>
+    var $table = $('#table');
+    var projects = [];
+    var chart;
+
+    function exportExcel() {
+        const year_name = parseInt($("#year_name").val());
+        window.location.href = `/exportexcel?year_name=${year_name}`;
+        // const year_name = parseInt($("#year_name").val());
+        // $.get("/exportexcel", {year_name: year_name}, (data) => {});
+    }
+
+    function initChartDom() {
+        chart = echarts.init(document.getElementById("chart"));
+    }
+
+    function initDataArray(projectsLength) {
+        var dataArray = new Array();
+        for (let i = 0; i < projectsLength; i++) {
+            dataArray[i] = new Array();
+        }
+        return dataArray;
+    } 
+
+    function pushDataArray(someData, someProject, month_name, data) {
+        const dataLength = data.length;
+        var sum = 0;
+        for (let i = 0; i < dataLength; i++) {
+            if (data[i].pj_name == someProject && data[i].month_name == month_name) {
+                sum += data[i].hour_time;
+            }
+        }
+        someData.push(sum);
+    }
+
+    function initSeries(series, projects, dataArray) {
+        const projectsLength = projects.length;
+        for (let i = 0; i < projectsLength; i++) {
+            const temp = {};
+            temp.name = projects[i];
+            temp.type = "bar";
+            temp.stack = "one";
+            temp.itemStyle = {
+                emphasis: {
+                    barBorderWidth: 1,
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowOffsetY: 0,
+                    shadowColor: 'rgba(0,0,0,0.5)'
+                }
+            };
+            temp.data = dataArray[i];
+
+            series.push(temp);
+        }
+    }
+
+    function formatChartData(data) {
+        const length = data.length;
+        const proset = new Set();
+        var xAxisData = Array(12).fill("");
+
+        for (let i = 0; i < length; i++) {
+            proset.add(data[i].pj_name);
+
+            switch (data[i].month_name) {
+                case "January":
+                    xAxisData[0] = "January";
+                    break;
+                case "February":
+                    xAxisData[1] = "February";
+                    break;
+                case "March":
+                    xAxisData[2] = "March";
+                    break;
+                case "April":
+                    xAxisData[3] = "April";
+                    break;
+                case "May":
+                    xAxisData[4] = "May";
+                    break;
+                case "June":
+                    xAxisData[5] = "June";
+                    break;
+                case "July":
+                    xAxisData[6] = "July";
+                    break;
+                case "August":
+                    xAxisData[7] = "August";
+                    break;
+                case "September":
+                    xAxisData[8] = "September";
+                    break;
+                case "October":
+                    xAxisData[9] = "October";
+                    break;
+                case "November":
+                    xAxisData[10] = "November";
+                    break;
+                case "December":
+                    xAxisData[11] = "December";
+                    break;
+            }
+        }
+
+        xAxisData = xAxisData.filter((value) => {
+            return value != ""
+        });
+
+        projects = Array.from(proset);
+
+        const xAxisDataLength = xAxisData.length;
+        // series 个数
+        const projectsLength = projects.length;
+
+        var dataArray = initDataArray(projectsLength);
+        for (let i = 0; i < xAxisDataLength; i++) {
+            for (let j = 0; j < projectsLength; j++) {
+                // 查找某个项目某个月份对应的工时
+                pushDataArray(dataArray[j], projects[j], xAxisData[i], data);
+            }
+        }
+        var series = [];
+        initSeries(series, projects, dataArray);
+
+        const option = {
+            title: {
+                text: "Bar",
+                x: "left"
+            },
+            legend: {
+                data: projects,
+                align: 'left'
+            },
+            toolbox: {
+                show: true,
+
+                feature: {
+
+                    saveAsImage: {
+                        show: true,
+                        title: "save as image"
+                    }
+                }
+            },
+
+            tooltip: {},
+            xAxis: {
+                data: xAxisData,
+                name: 'Month',
+                silent: false,
+                axisLine: {
+                    onZero: true
+                },
+                splitLine: {
+                    show: false
+                },
+                splitArea: {
+                    show: false
+                }
+            },
+            yAxis: {
+                splitArea: {
+                    show: false
+                }
+            },
+            grid: {
+                left: 100
+            },
+
+            series: series
+        };
+
+        chart.setOption(option);
+
+    }
+
+    function initChart() {
+        const year_name = parseInt($("#year_name").val());
+        $.get("/getchartdata", {year_name: year_name}, (data) => {
+            formatChartData(data);
+        });
+    }
+
+    // 清空图表缓存
+    function clearChartCache() {
+        chart.clear();
+    }
+
+    // 重置图表
+    function refreshChart() {
+        // 清空图表缓存
+        clearChartCache();
+        // 重新获得图表数据
+        initChart();
+    }
+
+
+    $(function() {
+        // 设定初始年份
+        const now_year = new Date().getFullYear();
+        $("#year_name").val(now_year);
+
+        initChartDom();
+        initChart();
+
+        window.onresize = () => {
+            chart.resize();
+        };
+
+        var otable = new tableinit();
+        otable.init();
+
+        $("#year_name").change(() => {
+            $('#table').bootstrapTable('refresh');
+            refreshChart();
+        });
+    });
+
+    var tableinit = function () {
+        var otableinit = new Object();
+        otableinit.init = function () {
+            $table.bootstrapTable({
+                toolbar: "#toolbar",
+                showRefresh: true,
+                showColumns: true,
+                search: true,
+                searchOnEnterKey: true,
+                url: "/getallworkinfo",
+                method: 'get',
+                cache: false,
+                striped: true,
+                pagination: true,
+                pageNumber: 1,
+                pageSize: 10,
+                pageList: [5, 10, 20, 50],
+                queryParams: (params) => {
+                    const year_name = parseInt($("#year_name").val());
+                    params.year_name = year_name;
+                    return params;
+                },
+                columns: [
+                    {
+                        title: "Employee / Facility Res-Grp",
+                        field: "user_account"
+                    },
+
+                    {
+                        title: "Project Name",
+                        field: "pj_name"
+                    }, 
+                    
+                    {
+                        title: 'Project Description',
+                        field: 'pj_instruction'
+                    },
+
+
+                    {
+                        title: "Role",
+                        field: 'role_name'
+                    }, 
+                    
+                    {
+                        title: 'Jan',
+                        field: 'January'
+                    },
+
+
+                    {
+                        title: "Feb",
+                        field: 'February'
+                    }, 
+                    
+                    {
+                        title: 'Mar',
+                        field: 'March'
+                    },
+
+
+                    {
+                        title: "Apr",
+                        field: 'April'
+                    }, 
+                    
+                    {
+                        title: 'May',
+                        field: 'May'
+                    },
+
+
+                    {
+                        title: "Jun",
+                        field: 'June'
+                    }, 
+                    
+                    {
+                        title: 'Jul',
+                        field: 'July'
+                    },
+
+
+                    {
+                        title: "Aug",
+                        field: 'August'
+                    }, 
+                    
+                    {
+                        title: 'Sep',
+                        field: 'September'
+                    },
+
+
+                    {
+                        title: "Oct",
+                        field: 'October'
+                    }, 
+                    
+                    {
+                        title: 'Nov',
+                        field: 'November'
+                    },
+
+
+                    {
+                        title: "Dec",
+                        field: 'December'
+                    }, 
+                    
+                    {
+                        title: 'sum',
+                        field: 'sum'
+                    }
+                ]
+            
+            });
+        };
+        return otableinit;
+    };
+</script>
+
+</html>

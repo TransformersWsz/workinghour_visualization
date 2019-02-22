@@ -38,29 +38,27 @@
         }
         #left {
             flex: 1;
-            height: 331px;
+            height: 400px;
+            margin-right: 5px;
         }
-        #middle {
-            width: 10%;
-            height: 331px;
-        }
+        
         #right {
             flex: 1;
-            height: 331px;
+            height: 400px;
+            margin-left: 5px;
         }
 
 
         #secondleft {
             flex: 1;
-            height: 331px;
+            height: 400px;
+            margin-right: 5px;
         }
-        #secondmiddle {
-            width: 10%;
-            height: 331px;
-        }
+        
         #secondright {
             flex: 1;
-            height: 331px;
+            height: 400px;
+            margin-left: 5px;
         }
 
         .out {
@@ -126,13 +124,11 @@
 
     <div class="chart">
         <div id="left"></div>
-        <div id="middle"></div>
         <div id="right"></div>
     </div>
 
     <div class="chart">
         <div id="secondleft"></div>
-        <div id="secondmiddle"></div>
         <div id="secondright"></div>
     </div>
 
@@ -157,9 +153,7 @@
             <i class="glyphicon glyphicon-plus"></i>
         </button>
 
-        <!-- <button type="button" class="btn btn-default" data-toggle="modal" data-target="#deletemodal" onclick="getRows()">
-            <i class="glyphicon glyphicon-minus"></i>
-        </button> -->
+        
 
         <button type="button" class="btn btn-default" onclick="getRows()">
             <i class="glyphicon glyphicon-minus"></i>
@@ -281,6 +275,23 @@
         <table id="table" data-editable-emptytext="--" data-show-fullscreen="true"></table>
     </div>
 
+    <div class="panel panel-success out">
+        <div class="panel-heading">
+            <h3 class="panel-title" style="font-size: 2rem">function instruction</h3>
+        </div>
+        <div class="panel-body">
+            <ul>
+                <li style="font-size: 18px">This web page is used to manage your own working hours.</li>
+                <li style="font-size: 18px"><span style="color:#428bca; font-size: 20px;">Bar:</span><span style="color: #30b524"> It will show you the working hours of different projects for every month.</span></li>
+                <li style="font-size: 18px"><span style="color:#428bca; font-size: 20px;">Pie1: </span><span style="color: #30b524">It will show you the time percent of every project in a specific year.</span></li>
+                <li style="font-size: 18px"><span style="color:#428bca; font-size: 20px;">Bar2: </span><span style="color: #30b524">It will show you the standard working hours, actual working hours and the gap working hours.</span></li>
+                <li style="font-size: 18px"><span style="color:#428bca; font-size: 20px;">Pie2: </span><span style="color: #30b524">It will show you the time percent of every role in a specific year.</span></li>
+                <li style="font-size: 22px; color: red;">If you delete Private leave\Training\Administration or edit their role, it will not work. Dont't worry.</li>
+                
+            </ul>
+        </div>
+    </div>
+
 
 
 </body>
@@ -290,30 +301,33 @@
 
     function getRows() {
         const rows = $table.bootstrapTable("getSelections");
-
-        var info = "";
-        var isDeleteIllegal = 1;
-        for (let i = 0; i < rows.length; i++) {
-            if (rows[i].pj_name == "Private leave" || rows[i].pj_name == "Training" || rows[i].pj_name == "Administration") {
-                isDeleteIllegal = 0;
-                break;
-            }
-            else {
-                if (i != rows.length - 1) {
-                    info += getPjnameRolenameMonthnamehourtime(rows[i]) + " , ";
-                } else {
-                    info += getPjnameRolenameMonthnamehourtime(rows[i]);
-                }
-            }
-        }
-        if (isDeleteIllegal == 0) {
-            window.alert("Private leave or Training or Administration cannot be deleted.");
+        if (rows.length == 0) {
+            window.alert("No row is selected!");
         }
         else {
-            $("#rows").html(info);
-            $("#deletemodal").modal("show");
+            var info = "";
+            var isDeleteIllegal = 1;
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i].pj_name == "Private leave" || rows[i].pj_name == "Training" || rows[i].pj_name == "Administration") {
+                    isDeleteIllegal = 0;
+                    break;
+                }
+                else {
+                    if (i != rows.length - 1) {
+                        info += getPjnameRolenameMonthnamehourtime(rows[i]) + " , ";
+                    } else {
+                        info += getPjnameRolenameMonthnamehourtime(rows[i]);
+                    }
+                }
+            }
+            if (isDeleteIllegal == 0) {
+                window.alert("Private leave or Training or Administration cannot be deleted.");
+            }
+            else {
+                $("#rows").html(info);
+                $("#deletemodal").modal("show");
+            }
         }
-        
     }
 
     function resetModal() {
@@ -452,7 +466,6 @@
                 }
             },
             yAxis: {
-                name: "hour",
                 splitArea: {
                     show: false
                 }
@@ -575,112 +588,124 @@
         }
     }
 
-    // 格式化第二个左边柱状图数据
-    function getFormattedDataOfLeft2Chart(data) {
-        const monthnames = [];
-        const standard = [];
-        const actual = [];
-        const gap = [];
-        const dataLength = data.length;
-        for (let i = 0; i < dataLength; i++) {
-            monthnames.push(data[i].month_name);
-            standard.push(100);
-            actual.push(data[i].totalhourtime);
-            gap.push(data[i].totalhourtime-100);
-        }
-        const formatResult = [];
-        formatResult.push(monthnames);
-        formatResult.push(standard);
-        formatResult.push(actual);
-        formatResult.push(gap);
-        return formatResult;
-    }
 
     // 显示第二个左边柱状图
     function formatSecondLeftChartsData(data) {
-        const formatResult = getFormattedDataOfLeft2Chart(data);
-        var option = {
-            title : {
-                text: "Bar2",
-                x: "left"
-            },
-            tooltip : {
-                trigger: 'axis',
-                axisPointer : {            // 坐标轴指示器，坐标轴触发有效
-                    type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
-                }
-            },
-            toolbox: {
-                show: true,
+        $.get("/getswhphh", {year_id: getYear_name()}, (swhphh) => {
+            const monthnames = [];
+            const standard = [];
+            const actual = [];
+            const gap = [];
 
-                feature: {
+            const swhphhLength = swhphh.length;
+            const dataLength = data.length; 
+            for (let i = 0; i < swhphhLength; i++) {
+                monthnames.push(swhphh[i].month_name);
+                standard.push(swhphh[i].swh);
 
-                    saveAsImage: {
-                        show: true,
-                        title: "save as image"
+                let isActualMonthExist = 0;
+                for (let j = 0; j < dataLength; j++) {
+                    if (swhphh[i].month_name == data[j].month_name) {
+                        isActualMonthExist = 1;
+                        actual.push(data[j].totalhourtime);;
+                        gap.push(data[j].totalhourtime - swhphh[i].swh);
+                        break;
                     }
                 }
-            },
-            legend: {
-                data: ['Standard', 'Actual', 'Gap']
-            },
-            grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
-                containLabel: true
-            },
-            xAxis : [
-                {
-                    type : 'value'
+                if (isActualMonthExist == 0) {
+                    actual.push(0);
+                    gap.push(0 - swhphh[i].swh);
                 }
-            ],
-            yAxis : [
-                {
-                    type : 'category',
-                    axisTick : {show: false},
-                    data : formatResult[0]
-                }
-            ],
-            series : [
-                {
-                    name:'Standard',
-                    type:'bar',
-                    label: {
-                        normal: {
-                            show: true,
-                            position: 'inside'
-                        }
-                    },
-                    data: formatResult[1]
-                },
-                {
-                    name:'Actual',
-                    type:'bar',
-                    stack: '总量',
-                    label: {
-                        normal: {
-                            show: true
-                        }
-                    },
-                    data: formatResult[2]
-                },
-                {
-                    name:'Gap',
-                    type:'bar',
-                    stack: '总量',
-                    label: {
-                        normal: {
-                            show: true,
-                            position: 'left'
-                        }
-                    },
-                    data: formatResult[3]
-                }
-            ]
-        };
-        secondLeftChart.setOption(option);
+            }
 
+            const formatResult = [];
+            formatResult.push(monthnames); 
+            formatResult.push(standard);
+            formatResult.push(actual);
+            formatResult.push(gap);
+
+            var option = {
+                title : {
+                    text: "Bar2",
+                    x: "left"
+                },
+                tooltip : {
+                    trigger: 'axis',
+                    axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                        type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                    }
+                },
+                toolbox: {
+                    show: true,
+
+                    feature: {
+
+                        saveAsImage: {
+                            show: true,
+                            title: "save as image"
+                        }
+                    }
+                },
+                legend: {
+                    data: ['Standard', 'Actual', 'Gap']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis : [
+                    {
+                        type : 'value'
+                    }
+                ],
+                yAxis : [
+                    {
+                        type : 'category',
+                        axisTick : {show: false},
+                        data : formatResult[0]
+                    }
+                ],
+                series : [
+                    {
+                        name:'Standard',
+                        type:'bar',
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'inside'
+                            }
+                        },
+                        data: formatResult[1]
+                    },
+                    {
+                        name:'Actual',
+                        type:'bar',
+                        stack: '总量',
+                        label: {
+                            normal: {
+                                show: true
+                            }
+                        },
+                        data: formatResult[2]
+                    },
+                    {
+                        name:'Gap',
+                        type:'bar',
+                        stack: '总量',
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'left'
+                            }
+                        },
+                        data: formatResult[3]
+                    }
+                ]
+            };
+            secondLeftChart.setOption(option);
+        });
     }
 
 

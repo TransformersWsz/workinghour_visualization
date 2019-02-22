@@ -233,6 +233,17 @@ const updateHybridHourtime = (db, req, res, next) => {
     });
 };
 
+// 普通成员和管理员都可以获得每年的swh和phh
+const getSwhphh = (db, req, res, next) => {
+    db.sequelize.query("select month_name, swh, phh from sshour where year_id = ?", {
+        replacements: [req.query.year_id],
+        type: db.sequelize.QueryTypes.SELECT
+    })
+    .then((result) => {
+        res.json(result);
+    });
+};
+
 
 const commonController = {};
 commonController.getProjects = getProjects;
@@ -243,5 +254,6 @@ commonController.login = login;
 commonController.updateUsernp = updateUsernp;
 commonController.updateHybridRoleid = updateHybridRoleid;
 commonController.updateHybridHourtime = updateHybridHourtime;
+commonController.getSwhphh = getSwhphh;
 
 module.exports = commonController;

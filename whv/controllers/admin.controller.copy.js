@@ -312,7 +312,7 @@ const beforeCellWrite = (row, cellData) => {
 
 const rowData = (formatResult) => {
     const result = formatResult.map((item) => {
-        return [item.user_account || "", item.pj_name || "", item.pj_instruction || "", item.role_name, item.January, item.February, item.March, item.April, item.May, item.June, item.July, item.August, item.September, item.October, item.November, item.December, item.sum];
+        return [item.user_account, String(item.pj_name), String(item.pj_instruction), item.role_name, item.January, item.February, item.March, item.April, item.May, item.June, item.July, item.August, item.September, item.October, item.November, item.December, item.sum];
     });
     return result;
 };
@@ -326,6 +326,32 @@ const exportExcel = (db, req, res, next) => {
     .then((result) => {
         const formatResult = Method.formatAllWorkInfo(result);
         const rowDataResult = rowData(formatResult);
+        //res.json(rowDataResult);
+
+        // res.json(
+        //     {
+        //         type: typeof(rowDataResult),
+        //         length: rowDataResult.length,
+        //         data: rowDataResult[0]
+        //     }
+        // );
+
+        // const test = [["test1", "name", null, "APP", 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12], ["test2", "name", null, "APP", 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12]];
+
+        const test = [];
+        const rowDataResultLength = rowDataResult.length;
+
+        for (let i = 0; i < rowDataResultLength; i++) {
+            
+            test.push([String(rowDataResult[i][0]), String(rowDataResult[i][1]), String(rowDataResult[i][2]), String(rowDataResult[i][3]), String(rowDataResult[i][4]), String(rowDataResult[i][5]), String(rowDataResult[i][6]), String(rowDataResult[i][7]), String(rowDataResult[i][8]), String(rowDataResult[i][9]), String(rowDataResult[i][10]), String(rowDataResult[i][11]), String(rowDataResult[i][12]), String(rowDataResult[i][13]), String(rowDataResult[i][14]), String(rowDataResult[i][15]), String(rowDataResult[i][16])]);
+        }
+
+        //res.json(test);
+
+        // const test = rowDataResult.map((item) => {
+        //     return item;
+        // });
+        // res.json(test);
 
         const ymd = Method.getYMD();
 
@@ -425,7 +451,7 @@ const exportExcel = (db, req, res, next) => {
             ["Report Type: Details - Work per Month - Month"],
             ["Employee / Facility Res-Grp", "Project Name", "Project Description", "Role", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "sum"]
         ];
-        rowDataResult.forEach((item) => {
+        test.forEach((item) => {
             conf.rows.push(item);
         });
         

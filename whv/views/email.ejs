@@ -40,6 +40,12 @@
             margin-left: auto;
             margin-right: auto;
         }
+
+        #rows {
+            color: red;
+            font-size: 20px;
+            font-weight: 900;
+        }
     </style>
 
 </head>
@@ -56,7 +62,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="/admin.html">Bosch Home</a>
+                <a class="navbar-brand" href="/statistic.html">Bosch Home</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
@@ -92,6 +98,9 @@
         <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal3">
             <i class="glyphicon glyphicon-plus"></i>
         </button>
+        <button type="button" class="btn btn-default" onclick="getRows()">
+            <i class="glyphicon glyphicon-minus"></i>
+        </button>
     </div>
 
     <!--新增收件人信息-->
@@ -102,7 +111,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title">Add Receiver Name And Email</h4>
+                    <h4 class="modal-title">Add Receiver Information</h4>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
@@ -124,9 +133,44 @@
         </div>
     </div>
 
+    <!-- 删除收件人信息 -->
+    <div class="modal fade" id="deletemodal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Delete Receiver Information</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure to delete these receivers' information : <span id="rows"></span>? If you delete, they will not receive emails.Be caution!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" id="del" onclick="deleteReceiversInformation()">delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="out">
         <table id="table" data-editable-emptytext="--"></table>
     </div>
+
+    <div class="panel panel-success out">
+        <div class="panel-heading">
+            <h3 class="panel-title" style="font-size: 2rem">function instruction</h3>
+        </div>
+        <div class="panel-body">
+            <ul>
+                <li style="font-size: 18px">This web page is used to remind members to book their effort of every month.</li>
+                <li style="font-size: 18px">The receiver email must be <span style="color: red; font-size: 25px">Bosch email</span>.</li>
+                <li style="font-size: 18px">Those added members will receive emails <span style="color: #1ab11c; font-size: 25px">sent by 3287124026@qq.com automatically.</span></li>
+                <li style="font-size: 18px">Those deleted members will not receive emails.</li>
+            </ul>
+        </div>
+    </div>
+
+    
 
 
 
@@ -134,6 +178,50 @@
 <script>
     var $table = $('#table');
     var count = 0;
+
+    function getRows() {
+        const rows = $table.bootstrapTable("getSelections");
+        if (rows.length == 0) {
+            window.alert("No row is selected!");
+        }
+        else {
+            var info = "";
+            for (let i = 0; i < rows.length; i++) {
+                if (i != rows.length - 1) {
+                    info += rows[i].receiver_name + " , ";
+                } else {
+                    info += rows[i].receiver_name;
+                }
+            }
+            $("#rows").html(info);
+            $("#deletemodal").modal("show");
+        }
+
+        
+    }
+
+    function deleteReceiversInformation() {
+        const rows = $table.bootstrapTable("getSelections");
+        const receiverinfos = rows.map((row) => {
+            return row["receiver_name"];
+        });
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json", //内容类型
+            dataType: "json",
+            url: "/deletereceiverinfos",
+            data: JSON.stringify(receiverinfos),
+            success: function (json) {
+                $('#deletemodal').modal('hide');
+                if (json.result == 1) {
+                    $('#table').bootstrapTable('refresh');
+                } else {
+                    window.alert("Delete failure, please try again later.");
+                }
+            }
+        });
+    }
 
 
     $(function () {
@@ -162,11 +250,19 @@
                 
                 columns: [
                     {
+                        checkbox: true
+                    },
+                    {
                         title: "Receiver Name",
                         field: "receiver_name",
                         editable: {
                             type: 'text',
-                            title: 'Receiver Name'
+                            title: 'Receiver Name',
+                            validate: (value) => {
+                                if (value == "") {
+                                    return "Empty receiver name";
+                                }
+                            }
                         }
                     },
 
@@ -175,11 +271,53 @@
                         field: "receiver_email",
                         editable: {
                             type: 'text',
-                            title: 'Receiver Email'
+                            title: 'Receiver Email',
+                            validate: (value) => {
+                                if (value.indexOf("@cn.bosch.com") == -1) {
+                                    return "Illegal receiver email";
+                                }
+                            }
                         }
                     }
                 ],
-                onEditableSave: (field, row, oldValue, $el) => {}
+                onEditableSave: (field, row, oldValue, $el) => {
+                    const jsondata = {};
+                    jsondata.oldValue = oldValue;
+                    if (field == "receiver_name") {
+                        jsondata.receiver_name = row[field];
+                        $.ajax({
+                            type: "post",
+                            url: "/updateinformreceivername",
+                            contentType: "application/json",
+                            data: JSON.stringify(jsondata),
+                            dataType: 'JSON',
+                            success: function (res) {
+                                if (res.result == 1) {
+                                } else {
+                                    window.alert("Duplicate receiver name.");
+                                    $('#table').bootstrapTable('refresh');
+                                }
+                            }
+                        });
+                    }
+                    else {
+                        jsondata.receiver_email = row[field];
+                        $.ajax({
+                            type: "post",
+                            url: "/updateinformreceiveremail",
+                            contentType: "application/json",
+                            data: JSON.stringify(jsondata),
+                            dataType: 'JSON',
+                            success: function (res) {
+                                if (res.result == 1) {
+                                } else {
+                                    window.alert("Duplicate receiver email.");
+                                    $('#table').bootstrapTable('refresh');
+                                }
+                            }
+                        });
+                    }
+                }
             });
         };
         return otableinit;
@@ -209,18 +347,16 @@
                 receiver_name: $("#receiver_name").val(),
                 receiver_email: $("#receiver_email").val()
             }, (json) => {
-                $('#modal3').modal('hide');
+                
                 if (json.result == 1) {
-                    $('#table').bootstrapTable('refresh');
+                    $('#modal3').modal('hide');
+                    $('#table').bootstrapTable("refresh");
                 } else {
                     window.alert("Duplicate receiver name or email!");
                 }
             });
         }
     }
-
-
-    
 </script>
 
 </html>

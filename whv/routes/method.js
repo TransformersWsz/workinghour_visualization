@@ -133,11 +133,73 @@ const mergeTwoArray = (source, target) => {
     }
 }
 
+// 初始化temp
+const initTemp = (temp) => {
+    temp["January"] = 0;
+    temp["February"] = 0;
+    temp["March"] = 0;
+    temp["April"] = 0;
+    temp["May"] = 0;
+    temp["June"] = 0;
+    temp["July"] = 0;
+    temp["August"] = 0;
+    temp["September"] = 0;
+    temp["October"] = 0;
+    temp["November"] = 0;
+    temp["December"] = 0;
+    temp["sum"] = 0;
+}
+
+// 将所有人的工作信息格式化发送给前端
+const formatAllWorkInfo = (result) => {
+    const res = [];
+    const resultLength = result.length;
+    const isUsed = new Array(resultLength).fill(0);
+    for (let i = 0; i < resultLength; i++) {
+        if (isUsed[i] == 0) {
+            const temp = {};
+            initTemp(temp);
+            temp.user_account = result[i].user_account.substring(0, result[i].user_account.indexOf("@cn.bosch.com"));
+            temp.pj_name = result[i].pj_name;
+            temp.pj_instruction = result[i].pj_instruction;
+            temp.role_name = result[i].role_name;
+            temp[result[i].month_name] += result[i].hour_time;
+            temp["sum"] += result[i].hour_time;
+
+            isUsed[i] = 1;
+
+            for (let j = i+1; j < resultLength; j++) {
+                if (isUsed[j] == 0 && result[i].user_account == result[j].user_account && result[i].pj_name == result[j].pj_name && result[i].role_name == result[j].role_name) {
+                    temp[result[j].month_name] += result[j].hour_time;
+                    temp["sum"] += result[j].hour_time;
+
+                    isUsed[j] = 1;
+                }
+            }
+            res.push(temp);
+        }
+    }
+    return res;
+};
+
+// 获取年月日
+const getYMD = () => {
+    const result = [];
+    
+    const date = new Date();
+    result.push(date.getFullYear());
+    result.push(date.getMonth());
+    result.push(date.getDate());
+
+    return result;
+};
 
 const Method = {};
 Method.formatGs = formatGs;
 Method.formatUsernp = formatUsernp;
 Method.formatHybrid = formatHybrid;
 Method.mergeTwoArray = mergeTwoArray;
+Method.formatAllWorkInfo = formatAllWorkInfo;
+Method.getYMD = getYMD;
 
 module.exports = Method;

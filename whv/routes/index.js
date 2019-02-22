@@ -13,7 +13,6 @@ const Method = require("./method.js");
 
 
 router.get("/gs", (req, res, next) => {
-	
 	CommonController.getWorkInfo(db, req, res, next);
 });
 
@@ -26,6 +25,11 @@ router.get("/chartsdata", (req, res, next) => {
 		.then(result => {
 			res.json(result);
 		});
+});
+
+// 获取所有人所有项目的月份分布信息
+router.get("/getchartdata", AdminController.checkAdminAuth, (req, res, next) => {
+	AdminController.getChartData(db, req, res, next);
 });
 
 router.get("/rolehourtime", (req, res, next) => {
@@ -63,7 +67,7 @@ router.get("/getprojects", (req, res, next) => {
 });
 
 /* GET home page. */
-router.get('/', function (req, res, next) {
+router.get("/", function (req, res, next) {
 	res.render('index');
 });
 
@@ -77,6 +81,22 @@ router.get("/swhphh.html", AdminController.checkAdminAuth, (req, res, next) => {
 	res.render("swhphh");
 });
 
+/* GET statistic.html page. */
+router.get("/statistic.html", AdminController.checkAdminAuth, (req, res, next) => {
+	res.render("statistic");
+});
+
+// 获取所有人的工作信息
+router.get("/getallworkinfo", AdminController.checkAdminAuth, (req, res, next) => {
+	AdminController.getAllWorkInfo(db, req, res, next);
+});
+
+// 导出所有人的工作信息
+router.get("/exportexcel", AdminController.checkAdminAuth, (req, res, next) => {
+	AdminController.exportExcel(db, req, res, next);
+});
+
+
 /* GET email.html page. */
 router.get("/email.html", AdminController.checkAdminAuth, (req, res, next) => {
 	res.render("email");
@@ -89,12 +109,43 @@ router.post("/getinform", AdminController.checkAdminAuth, (req, res, next) => {
 
 // 添加收件人信息
 router.post("/addreceiverinformation", AdminController.checkAdminAuth, (req, res, next) => {
-	
+	AdminController.addReceiverInformation(db, req, res, next);
 });
 
-// 获取每年的swh phh
+// 更改收件人的姓名
+router.post("/updateinformreceivername", AdminController.checkAdminAuth, (req, res, next) => {
+	AdminController.updateInformReceiverName(db, req, res, next);
+});
+
+// 更改收件人的邮箱
+router.post("/updateinformreceiveremail", AdminController.checkAdminAuth, (req, res, next) => {
+	AdminController.updateInformReceiverEmail(db, req, res, next);
+});
+
+// 删除收件人的信息
+router.post("/deletereceiverinfos", AdminController.checkAdminAuth, (req, res, next) => {
+	const receiverInfos = req.body;
+	const receiverInfosLength = receiverInfos.length;
+	var count = receiverInfosLength;
+	for (let i = 0; i < receiverInfosLength; i++) {
+		AdminController.deleteOneReceiverInfo(db, receiverInfos[i], req, res);
+		count--;
+	}
+	if (count == 0) {
+		res.json({
+			result: 1
+		});
+	}
+});
+
+// 管理员获取每年的swh phh
 router.post("/getswhphh", AdminController.checkAdminAuth, (req, res, next) => {
 	AdminController.getSwhphh(db, req, res, next);
+});
+
+// 普通成员获取每年的swh phh
+router.get("/getswhphh", (req, res, next) => {
+	CommonController.getSwhphh(db, req, res, next);
 });
 
 // 更新每年的 swh
